@@ -1,0 +1,26 @@
+<div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div class="w-full max-w-md p-8 bg-white rounded shadow">
+        <h2 class="text-2xl font-bold text-center mb-6">登入</h2>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <div class="mb-4">
+                <label class="block mb-1">Email</label>
+                <input nz-input formControlName="email" type="email" placeholder="請輸入 Email" />
+            </div>
+            <div class="mb-4">
+                <label class="block mb-1">密碼</label>
+                <input nz-input formControlName="password" type="password" placeholder="請輸入密碼" />
+            </div>
+            <div *ngIf="errorMessage" class="text-red-500 text-center mb-2">{{ errorMessage }}</div>
+            <button nz-button nzType="primary" class="w-full mb-2" [nzLoading]="loading"
+                [disabled]="loginForm.invalid || loading" type="submit">
+                <i nz-icon nzType="login" nzTheme="outline"></i> 登入
+            </button>
+        </form>
+        <button nz-button nzType="default" class="w-full mb-2" (click)="onGoogleLogin()" [disabled]="loading">
+            <i nz-icon nzType="user" nzTheme="outline"></i> 使用 Google 登入
+        </button>
+        <div class="text-center mt-4">
+            <a routerLink="/hub/register">還沒有帳號？註冊</a>
+        </div>
+    </div>
+</div>
