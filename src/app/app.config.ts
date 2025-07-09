@@ -1,23 +1,23 @@
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { AngularFireFunctionsModule } from '@angular/fire/compat/functions';
+import { AngularFireStorageModule } from '@angular/fire/compat/storage';
+import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
 import { environment } from '../environments/environment';
-import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
-import { provideFirestore, getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
-import { provideFunctions, getFunctions, connectFunctionsEmulator} from '@angular/fire/functions';
-import { provideMessaging, getMessaging } from '@angular/fire/messaging';
-import { provideStorage, getStorage, connectStorageEmulator } from '@angular/fire/storage';
 import { routes } from './app.routes';
 import { provideRouter } from '@angular/router';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     importProvidersFrom(
-      provideFirebaseApp(() => initializeApp(environment.firebase)),
-      provideFirestore(() => getFirestore()),
-      provideAuth(() => getAuth()),
-      provideFunctions(() => getFunctions()),
-      provideStorage(() => getStorage()),
-      provideMessaging(() => getMessaging())
+      AngularFireModule.initializeApp(environment.firebase),
+      AngularFirestoreModule,
+      AngularFireAuthModule,
+      AngularFireFunctionsModule,
+      AngularFireStorageModule,
+      AngularFireMessagingModule
     ),
     provideRouter(routes)
   ],

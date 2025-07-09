@@ -71,3 +71,4 @@ firestore.rules
 /src/assets
 firebase.json
 firestore.indexes.json
+src/favicon.ico
