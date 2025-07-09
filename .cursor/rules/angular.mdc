@@ -1,0 +1,803 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+<!--
+⚠️ 本專案所有極簡主義名言與 Next.js 極簡原則，請強制參考 .cursor/rules/minimalism-quotes.mdc，不可自行複製或修改內容。
+-->
+---
+description: Next.js 15 極簡主義開發規範，適用於 Cursor AI 的開發指南
+globs: 
+  - "*.ts"
+  - "*.tsx"
+  - "*.js"
+  - "*.jsx"
+alwaysApply: true
+---
+---
+description: 嚴格區分 client/server，職責分離，最小化客戶端程式碼
+globs: 
+  - "src/**/*.ts"
+  - "src/**/*.tsx"
+alwaysApply: true
+---
+
+# Angular 19 極簡主義開發規範
+適用於 Cursor AI 的 Angular 開發指南
+
+## 🚨 強制性規則 - 絕對不可修改 FORBIDDEN TO MODIFY
+
+### ⚠️ 以下內容在任何情況下都不可修改：
+- **專案概述 Project Overview** 章節的所有內容
+- **核心原則 Core Principles** 章節的所有內容  
+- **TypeScript 嚴格模式規範** 章節的所有內容
+- **Angular 19 架構規範** 章節的所有內容
+- **Angular 元件規範** 章節的所有內容
+- **Firebase 專案與 Client SDK 強制規範** 章節的所有內容
+- **無意義膨脹防止具體規範 Anti-Bloat Rules** 章節的所有內容
+- **極簡提醒 Reminder** 章節的所有內容
+
+### 🔒 每次生成代碼必須遵守的規則：
+1. **嚴格遵循極簡主義** - 單檔 <100 行，避免過度設計
+2. **TypeScript 嚴格模式** - 嚴禁使用 `any` 型別
+3. **Angular 最佳實踐** - 使用 Angular CLI 和標準模式
+4. **Firebase 官方 SDK** - 只使用官方 Client SDK，不自行包裝
+5. **避免過度抽象** - 不建立單次使用的 service、pipe、directive
+6. **命名規範** - 使用 PascalCase 元件，camelCase 變數
+7. **樣式規範** - 使用 Angular Material + CSS，避免過度自訂
+8. **狀態管理** - 優先使用 Angular 內建狀態管理，避免過度使用 NgRx
+9. **效能優化** - 避免預先優化，優先 OnPush 策略
+10. **模組化** - 保持模組簡潔，避免過度分割
+
+### 🚫 絕對禁止的行為：
+- 修改上述章節的任何內容
+- 使用 `any` 型別或繞過型別檢查
+- 建立不必要的 API 服務或 HTTP 攔截器
+- 使用非官方 Firebase SDK 或自行包裝
+- 建立單次使用的抽象層或包裝元件
+- 過度使用 NgRx 或複雜狀態管理
+- 使用 React 風格的程式碼模式
+- 建立無法重複使用的自訂 pipe 或 directive
+
+---
+
+## 📋 專案概述 Project Overview
+
+### 🏗️ 專案架構
+- **框架**: Angular 19.0.0 (最新穩定版)
+- **語言**: TypeScript 5 (嚴格模式)
+- **部署**: Firebase Hosting
+- **Node.js**: 20.x
+
+### 🗄️ 資料庫與後端
+- **主要資料庫**: Firebase Firestore (NoSQL)
+- **認證**: Firebase Authentication
+- **檔案儲存**: Firebase Storage
+- **即時資料**: Firebase Realtime Database (如需要)
+- **安全規則**: Firestore Security Rules
+
+### 🔥 Firebase Client SDK 使用
+```typescript
+// 已安裝的 Firebase 套件
+import { initializeApp } from 'firebase/app'
+import { getAuth } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
+import { getStorage } from 'firebase/storage'
+import { getAppCheck } from 'firebase/app-check'
+import { getRemoteConfig } from 'firebase/remote-config'
+```
+
+### 📦 核心依賴包 (最新版本)
+- **Angular**: 19.0.0
+- **Angular Material**: 19.0.0 (UI 元件庫)
+- **Angular CDK**: 19.0.0 (元件開發套件)
+- **AngularFire**: 19.0.0 (Firebase 整合)
+- **ngx-permissions**: 19.0.0 (權限管理)
+- **ngx-admin**: 最新版 (管理後台模板)
+- **RxJS**: 7.8.0 (響應式程式設計)
+- **TypeScript**: 5.8.2
+
+### 🎨 UI/UX 套件
+- **Angular Material**: 完整的 Material Design 元件庫
+- **Angular CDK**: 無樣式元件開發套件
+- **ngx-admin**: 豐富的管理後台元件
+- **Angular Material Tree**: MatTree 樹狀結構元件
+
+### 🔧 開發工具
+- **Angular CLI**: 19.0.0 (開發工具)
+- **ESLint**: 程式碼檢查
+- **Prettier**: 程式碼格式化
+- **Karma + Jasmine**: 測試框架
+
+### 📁 專案結構
+```
+src/
+├── app/                    # Angular 應用程式
+│   ├── core/              # 核心服務和守衛
+│   ├── shared/            # 共享元件和管道
+│   ├── features/          # 功能模組
+│   ├── layout/            # 佈局元件
+│   └── app.component.ts   # 根元件
+├── assets/                # 靜態資源
+├── environments/          # 環境配置
+└── styles/               # 全域樣式
+```
+
+### 🚀 快速開始
+1. **Firebase 配置**: 使用 Firebase Console 設定專案
+2. **認證**: Firebase Auth (Email/Password, Google, GitHub)
+3. **資料庫**: Firestore 集合結構設計
+4. **安全規則**: Firestore Security Rules 設定
+5. **部署**: `ng build && firebase deploy`
+
+---
+
+## 🎯 核心原則 Core Principles
+
+### 極簡主義 Minimalism
+- **只實作必要功能** - 避免過度設計和預先優化
+- **程式碼最小化** - 單檔建議 <100 行，超過時檢查簡化空間
+- **UI/UX 極簡** - 只保留核心資訊與操作，無多餘裝飾
+- **Less is More** - 每次產生的程式碼都應該能用此原則形容
+
+### 職責分離 Separation of Concerns
+- **邏輯/樣式分離** - 業務邏輯與 UI 樣式完全分離
+- **模組/元件分離** - 嚴格區分模組與元件的職責
+- **功能模組化** - 每個檔案只負責單一明確功能
+
+## 🛡️ TypeScript 嚴格模式規範
+
+### 嚴格模式通用規範
+- 專案必須啟用 TypeScript `strict` 模式（`"strict": true`）
+- 嚴禁使用 `any` 型別，所有型別必須明確、具體
+- 必須啟用並遵守以下選項（`tsconfig.json`）：
+  - `"noImplicitAny": true`
+  - `"strictNullChecks": true`
+  - `"strictFunctionTypes": true`
+  - `"strictBindCallApply": true`
+  - `"strictPropertyInitialization": true`
+  - `"noImplicitThis": true`
+  - `"alwaysStrict": true`
+- 所有函式參數、返回值、物件屬性皆需明確標註型別
+- 禁止型別斷言（as）取巧規避型別檢查
+- 禁止使用 `@ts-ignore`、`@ts-expect-error` 等註解繞過型別檢查
+- 型別定義應扁平直觀，優先 interface，僅於必要時使用 type/union
+- 嚴禁「any 轉來轉去」、「unknown 強轉」等行為
+
+### 命名規範
+- 使用 camelCase 用於變數、函式、物件屬性
+- 使用 PascalCase 用於類別、介面、型別別名、元件
+- 使用 UPPER_SNAKE_CASE 用於常數
+- 避免冗餘前綴，偏好描述性名稱
+
+## 🏗️ Angular 19 架構規範
+
+### 模組結構
+```
+src/app/
+├── app.module.ts          # 根模組
+├── app.component.ts       # 根元件
+├── app.component.html     # 根模板
+├── app.component.scss     # 根樣式
+├── core/                  # 核心模組
+│   ├── core.module.ts
+│   ├── services/         # 核心服務
+│   └── guards/           # 路由守衛
+├── shared/               # 共享模組
+│   ├── shared.module.ts
+│   ├── components/       # 共享元件
+│   └── pipes/           # 共享管道
+└── features/            # 功能模組
+    ├── auth/            # 認證模組
+    ├── dashboard/       # 儀表板模組
+    └── admin/           # 管理模組
+```
+
+### 嚴格模組化原則
+
+#### 核心模組 (Core Module)
+```typescript
+// ✅ 正確：核心模組只包含全域服務
+@NgModule({
+  providers: [
+    AuthService,
+    UserService,
+    PermissionGuard
+  ]
+})
+export class CoreModule { }
+```
+
+#### 共享模組 (Shared Module)
+```typescript
+// ✅ 正確：共享模組包含可重用元件
+@NgModule({
+  declarations: [
+    LoadingSpinnerComponent,
+    ConfirmDialogComponent
+  ],
+  exports: [
+    LoadingSpinnerComponent,
+    ConfirmDialogComponent,
+    CommonModule,
+    MaterialModule
+  ]
+})
+export class SharedModule { }
+```
+
+#### 功能模組 (Feature Module)
+```typescript
+// ✅ 正確：功能模組包含特定功能
+@NgModule({
+  imports: [
+    SharedModule,
+    RouterModule.forChild(routes)
+  ],
+  declarations: [
+    UserListComponent,
+    UserDetailComponent
+  ]
+})
+export class UserModule { }
+```
+
+### 禁止使用不必要的模組
+- ❌ **嚴禁建立** 只包含一個元件的模組
+- ❌ **嚴禁建立** 只為包裝而存在的模組
+- ✅ **使用 Lazy Loading** 進行程式碼分割
+- ✅ **保持模組簡潔** 每個模組職責明確
+
+## 📁 檔案組織規範
+
+### 元件結構
+```
+src/
+├── app/               # Angular 應用程式
+├── assets/           # 靜態資源
+├── environments/     # 環境配置
+└── styles/          # 全域樣式
+```
+
+### 元件分類原則
+- **Smart Components** - 包含業務邏輯的元件
+- **Dumb Components** - 純展示元件，無業務邏輯
+- **UI Components** - 可重用的 UI 元件
+
+## 🧩 Angular 元件規範
+
+### 元件定義
+```typescript
+// ✅ 正確：明確的元件介面
+interface UserCardComponent {
+  user: User;
+  onEdit?: EventEmitter<string>;
+}
+
+@Component({
+  selector: 'app-user-card',
+  templateUrl: './user-card.component.html',
+  styleUrls: ['./user-card.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class UserCardComponent {
+  @Input() user!: User;
+  @Output() edit = new EventEmitter<string>();
+
+  onEditClick(userId: string): void {
+    this.edit.emit(userId);
+  }
+}
+```
+
+### 命名規範
+- 使用 PascalCase 命名元件
+- 檔案名稱與主要元件名稱一致（例如：UserCardComponent）
+- 避免使用 index.ts，除非是模組集合的匯出檔案
+- 目錄使用小寫加連字號（例如：components/user-management）
+
+## 🎨 樣式與 UI 規範
+
+### Angular Material 使用原則
+- 使用 Angular Material 進行元件樣式設計
+- 實作響應式設計，採用行動優先方法
+- 避免在列表或項目集合中使用 margin 進行間距，使用 gap
+- margin 只用於將高層級元件放置到另一個元件中
+
+### 顏色系統
+- 使用 Angular Material 主題色彩
+- 避免使用自訂顏色，優先使用 Material Design 調色盤
+- 使用主題色彩：
+  - Primary: 主要動作和 UI 位置
+  - Secondary: 品牌色彩
+  - Accent: 行動呼籲
+  - Neutral: 取消、關閉
+  - Base: 基礎色彩
+
+### 響應式設計
+- 使用 Angular Material 的響應式工具
+- 使用 Flex Layout 進行響應式佈局
+- 優先使用 Material Design 的斷點系統
+
+## 🔧 狀態管理
+
+### 本地狀態
+- 使用 Angular 內建的狀態管理
+- 使用 OnPush 變更檢測策略提升效能
+- 使用 RxJS 進行響應式狀態管理
+
+### 全域狀態
+- 優先使用 Angular 的服務進行狀態管理
+- 避免過度使用 NgRx，只在複雜狀態時使用
+- 使用 BehaviorSubject 進行簡單的全域狀態管理
+
+## 📦 套件依賴 Dependencies
+
+### 核心框架 Core Framework
+- **Angular 19** - 最新穩定版框架
+- **TypeScript 5** - 嚴格模式、路徑別名
+- **RxJS 7** - 響應式程式設計
+
+### UI 與樣式 UI & Styling
+- **Angular Material 19** - Material Design 元件庫
+- **Angular CDK 19** - 元件開發套件
+- **ngx-admin** - 管理後台模板
+
+### 狀態管理 State Management
+- **Angular Services** - 內建狀態管理
+- **RxJS** - 響應式狀態管理
+- **NgRx** - 複雜狀態管理（僅在必要時）
+
+### 後端與服務 Backend & Services
+- **Firebase** - 認證、Firestore、Storage、Hosting
+- **AngularFire** - Firebase 整合
+- **ngx-permissions** - 權限管理
+
+### 開發工具 Development Tools
+- **Angular CLI** - 開發工具
+- **ESLint** - 程式碼檢查
+- **Prettier** - 程式碼格式化
+- **Karma + Jasmine** - 測試框架
+
+## 🚫 禁止反模式 Anti-Patterns to Avoid
+
+### 避免過度抽象
+```typescript
+// ❌ 錯誤：過度抽象
+@Component({
+  selector: 'app-user-card-wrapper',
+  template: '<ng-content></ng-content>'
+})
+export class UserCardWrapperComponent { }
+
+// ✅ 正確：直接實作
+@Component({
+  selector: 'app-user-card',
+  template: `
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>{{ user.name }}</mat-card-title>
+      </mat-card-header>
+    </mat-card>
+  `
+})
+export class UserCardComponent {
+  @Input() user!: User;
+}
+```
+
+### 避免不必要的服務
+```typescript
+// ❌ 錯誤：為單一用途建立服務
+@Injectable()
+export class UserCardService {
+  formatUserName(user: User): string {
+    return `${user.firstName} ${user.lastName}`;
+  }
+}
+
+// ✅ 正確：直接在元件中處理
+export class UserCardComponent {
+  formatUserName(user: User): string {
+    return `${user.firstName} ${user.lastName}`;
+  }
+}
+```
+
+### 禁止事項
+- ❌ 將微小邏輯拆分成過多檔案/元件
+- ❌ 建立無法重複使用（<2 次）的自訂 pipe 或 directive
+- ❌ 提前抽象或泛化
+- ❌ 過度使用 NgRx 或複雜狀態管理
+- ❌ 為特殊情境寫複雜設定檔
+- ❌ 僅為單次用途安裝套件
+- ❌ 不要使用 React 風格的程式碼模式
+- ❌ 不要使用 any 型別
+
+## 📊 效能優化
+
+### 預設優化
+- ✅ **OnPush 變更檢測** - 提升元件效能
+- ✅ **Lazy Loading** - 模組懶載入
+- ✅ **TrackBy 函數** - 優化 ngFor 效能
+- ✅ **Async Pipe** - 自動訂閱管理
+
+### 避免過度優化
+- ❌ 不要預先優化未確認的效能問題
+- ❌ 不要為單次使用建立複雜的快取策略
+- ❌ 不要過度使用 OnPush 策略
+
+## 📝 命名規範
+
+### 檔案命名
+- `*.component.ts` - 元件類別
+- `*.component.html` - 元件模板
+- `*.component.scss` - 元件樣式
+- `*.module.ts` - 模組定義
+- `*.service.ts` - 服務類別
+- `*.pipe.ts` - 管道類別
+- `*.directive.ts` - 指令類別
+
+### 元件命名
+- 使用 PascalCase
+- 名稱直接反映用途
+- 避免冗長或抽象命名
+
+## 🔥 Firebase 專案與 Client SDK 強制規範
+
+- 本專案所有與 Firebase 相關代碼，**必須明確標註來源自 [Firebase Console](https://console.firebase.google.com) 的專案設定**，並只允許使用官方 Client SDK
+- 嚴禁自行串接 REST API、第三方 SDK 或非官方文件未記載的方法
+- 所有 Firebase 初始化與服務（如 Firestore、Auth、Storage）皆須用官方 npm firebase 套件與標準 API，不可自行包裝或魔改
+- 每個涉及 Firebase 的檔案、元件，開頭加上註解說明專案來源與工具（如：「本檔案依據 Firebase Console 專案設定，使用 Firebase Client SDK 操作 Cloud Firestore」）
+- 嚴禁將 Firebase 操作混入第三方框架、抽象層、service、pipe。資料存取直接以官方 API 實作，確保 Minimalism
+- 所有 Firestore 結構、權限、index 必須於 Firebase Console 設定，不於程式碼硬寫
+
+## 🚫 無意義膨脹防止具體規範 Anti-Bloat Rules
+
+- 嚴禁產生僅為包裝/轉發的 Wrapper 元件或 index.ts
+- 嚴禁預留未來欄位、未來用的型別、未使用的 Input/Output
+- 嚴禁建立僅被用一次的 service、pipe、directive
+- 嚴禁為單一用途建立 config、constants 檔案
+- 每一次程式碼產生（AI/自動化/人工）都必須主動檢查有無可簡化、合併、移除的部分，並主動簡化
+- 強制在 PR/提交前執行自動化腳本審查是否出現上述 anti-pattern
+
+## ⚙️ Cursor / AI Prompts
+
+### 若產出過於冗長：
+- Prompt: `Simplify it`
+- Prompt: `Collapse logic`
+- Prompt: `Less code, same logic`
+
+## 📚 最佳實踐總結
+
+1. **優先 Angular 內建功能** - 減少第三方依賴
+2. **嚴格職責分離** - 邏輯與樣式分離
+3. **最小化程式碼** - 單檔 <100 行
+4. **避免過度設計** - 只實作必要功能
+5. **使用 Angular 19 特性** - 充分利用新功能
+6. **保持簡單** - 複雜度是敵人
+
+---
+
+## 🧘 極簡主義全球名言集 Minimalism Global Quotes Collection
+
+> 當沒有什麼可以再刪減時，才是最完美的。  
+> Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away.  
+> —— 聖修伯里 / Antoine de Saint-Exupéry
+
+---
+
+> 簡單是終極的精緻。  
+> Simplicity is the ultimate sophistication.  
+> —— 達文西 / Leonardo da Vinci
+
+---
+
+> 少，但更好。  
+> Less, but better.  
+> —— Dieter Rams
+
+---
+
+> 最好的設計是最簡單但能運作的設計。  
+> The best design is the simplest one that works.  
+> —— （傳）愛因斯坦 / (Attributed to) Albert Einstein
+
+---
+
+> 簡化的能力，就是刪去多餘，讓必要的說話。  
+> The ability to simplify means to eliminate the unnecessary so that the necessary may speak.  
+> —— Hans Hofmann
+
+---
+
+> 極簡不是缺乏什麼，而是恰到好處。  
+> Minimalism is not a lack of something. It's simply the perfect amount of something.  
+> —— Nicholas Burroughs
+
+---
+
+> 簡單歸結為兩步：找出本質，刪除其餘。  
+> Simplicity boils down to two steps: Identify the essential. Eliminate the rest.  
+> —— Leo Babauta
+
+---
+
+> 簡單——最大限度減少未做的工作——是至關重要的。  
+> Simplicity—the art of maximizing the amount of work not done—is essential.  
+> —— 敏捷宣言 / Agile Manifesto
+
+---
+
+> 任何傻瓜都能讓事情變複雜，唯有天才能讓它變簡單。  
+> Any fool can make something complicated. It takes a genius to make it simple.  
+> —— Woody Guthrie
+
+---
+
+> 清晰重於聰明。  
+> Clarity is better than cleverness.  
+> —— Dan McKinley（前 GitHub 工程師 / former GitHub engineer）
+
+---
+
+> 簡單的事應該簡單，複雜的事應該可行。  
+> Simple things should be simple, complex things should be possible.  
+> —— Alan Kay
+
+---
+
+> 極簡不是剝奪，而是更珍惜真正重要的事物。  
+> Simplicity is not about deprivation. Simplicity is about a greater appreciation for things that really matter.  
+> —— Anonymous
+
+---
+
+> 設計不僅僅是外觀和感覺，而是它如何運作。  
+> Design is not just what it looks like and feels like. Design is how it works.  
+> —— Steve Jobs
+
+---
+
+> 可靠性的代價是對極致簡單的追求。  
+> The price of reliability is the pursuit of the utmost simplicity.  
+> —— Tony Hoare
+
+---
+
+> 軟體開發最重要的一點就是明確你想要建造什麼。  
+> The most important single aspect of software development is to be clear about what you are trying to build.  
+> —— Bjarne Stroustrup
+
+---
+
+> 如果你做不到好，至少要讓它好看。  
+> If you can't make it good, at least make it look good.  
+> —— Bill Gates
+
+---
+
+> 預測未來最好的方式是創造它。  
+> The best way to predict the future is to invent it.  
+> —— Alan Kay
+
+---
+
+> 軟體設計有兩種方式：一種是簡單到沒有明顯缺陷，另一種是複雜到沒有明顯缺陷。  
+> There are two ways of constructing a software design: One way is to make it so simple that there are obviously no deficiencies and the other way is to make it so complicated that there are no obvious deficiencies.  
+> —— C. A. R. Hoare
+
+---
+
+> 小即是美。  
+> Small is beautiful.  
+> —— E. F. Schumacher
+
+---
+
+> 最簡的解法幾乎總是最好的。  
+> The simplest solution is almost always the best.  
+> —— 奧卡姆剃刀 / Occam's Razor
+
+---
+
+> 好設計即最少設計。  
+> Good design is as little design as possible.  
+> —— Dieter Rams
+
+---
+
+> 留白是主動元素，不是被動背景。  
+> Whitespace is to be regarded as an active element, not a passive background.  
+> —— Jan Tschichold
+
+---
+
+> 細節不是細節，它們成就設計。  
+> The details are not the details. They make the design.  
+> —— Charles Eames
+
+---
+
+> 簡單是減去顯而易見並加上有意義的東西。  
+> Simplicity is about subtracting the obvious and adding the meaningful.  
+> —— John Maeda
+
+---
+
+> 簡單是可靠的前提。  
+> Simplicity is prerequisite for reliability.  
+> —— Edsger W. Dijkstra
+
+---
+
+> 先解決問題，再寫程式。  
+> First, solve the problem. Then, write the code.  
+> —— John Johnson
+
+---
+
+> 如果你無法簡單解釋，那你還沒理解夠深。  
+> If you can't explain it simply, you don't understand it well enough.  
+> —— 愛因斯坦 / Albert Einstein
+
+---
+
+> 過早的最佳化是萬惡之源。  
+> Premature optimization is the root of all evil.  
+> —— Donald Knuth
+
+---
+
+> 程式就像幽默，你需要說明就不好笑了。  
+> Code is like humor. When you have to explain it, it's bad.  
+> —— Cory House
+
+---
+
+> 最好的程式碼就是不寫程式碼。  
+> The best code is no code at all.  
+> —— Jeff Atwood
+
+---
+
+> 好、快、便宜，三選二。  
+> Good, fast, cheap. Pick two.  
+> —— 軟體工程三角 / Software Engineering Triangle
+
+---
+
+## 🚀 Angular 與現代前端極簡開發原則 Angular & Modern Frontend Minimalism Principles
+
+> 優先使用 Angular 內建功能，減少第三方依賴。  
+> Embrace Angular built-in features.  
+> — Prefer Angular native features to reduce third-party dependencies.
+
+---
+
+> 服務邏輯直接寫在服務中，保持檔案與邏輯極簡。  
+> Keep services simple and focused.  
+> — Write service logic directly in services, keeping files and logic minimal.
+
+---
+
+> 僅在需要互動時才使用 Client Components。  
+> Only use Client Components when necessary.  
+> — Use Client Components only when interactivity is needed.
+
+---
+
+> 每個檔案/元件只做一件事。  
+> Single Responsibility Principle.  
+> — Every file/component should do only one thing.
+
+---
+
+> 檔案與資料夾結構扁平、可預期。  
+> Flat and predictable structure.  
+> — Keep the file and folder structure flat and predictable.
+
+---
+
+> 少即是多，每段程式碼都遵循這原則。  
+> Less is more.  
+> — Every piece of code produced should embody this principle.
+
+---
+
+> 僅實作現在需要的功能，不為未來預留過多結構。  
+> No future-proofing code.  
+> — Only implement what is needed now, avoid overengineering for possible future needs.
+
+---
+
+> 偏好組合而非抽象，除非重複性極高。  
+> Prefer composition over abstraction.  
+> — Prefer composition over abstraction unless repetition is very high.
+
+---
+
+> 嚴禁只為包裝 UI 或 props 的無用 Wrapper 元件。  
+> No wrapper components without logic.  
+> — Avoid wrapper components that only wrap UI or props without logic.
+
+---
+
+> 優先用 Angular、TypeScript 原生功能，不輕易引入第三方。  
+> Use native features first.  
+> — Prefer Angular and TypeScript native features before introducing third-party libraries.
+
+---
+
+> 每個檔案都應可獨立測試且極簡。  
+> Every file should be a small, testable unit.  
+> — Each file should be independently testable and minimal.
+
+---
+
+> 有重複時才重構，沒重複勿抽象。  
+> If you're repeating yourself, refactor. If you're not, don't abstract.  
+> — Refactor only after repetition emerges; avoid premature abstraction.
+
+---
+
+> 先追求可讀性，再追求效能。  
+> Optimize for readability, then for performance.  
+> — Readability first, then performance.
+
+---
+
+> 優先社群慣例，減少自訂設定。  
+> Favor convention over configuration.  
+> — Prefer community conventions, minimize custom configurations.
+
+---
+
+> 讓框架自動處理繁雜細節，專注核心邏輯。  
+> Let the framework do the heavy lifting.  
+> — Let the framework handle complexity, focus on core logic.
+
+---
+
+> 必要時才 SSR，能靜態就 SSG，只有必須時才 CSR。  
+> SSR when you must, SSG when you can, CSR only when required.  
+> — Use Server-Side Rendering when necessary, Static Generation when possible, Client-Side Rendering only when required.
+
+---
+
+> 沒有測量的效能問題，不要隨意最佳化。  
+> Don't optimize what you haven't measured.  
+> — Don't optimize for performance without measurement.
+
+---
+
+> 最好的元件是你根本不必寫的元件。  
+> The best component is the one you never have to write.  
+> — The best component is the one you don't need to implement.
+
+---
+
+> 以用戶需求決定功能，不是追逐技術潮流。  
+> Let user needs drive your features, not technology trends.  
+> — User needs define features, not technology fads.
+
+---
+
+## 📝 使用說明 Usage Instructions
+
+此檔案包含極簡主義的經典名言和 Angular 19 極簡開發原則，可作為程式碼生成時的指導方針。
+
+### 適用場景：
+- 程式碼生成時的設計原則參考
+- 開發決策的指導方針
+- 程式碼審查的標準依據
+- 團隊開發的文化建立
+
+### 核心精神：
+> "完美不是無可添加，而是無可刪減。"  
+> "Perfection is achieved not when there is nothing more to add, but when there is nothing left to take away."
+description:
+globs:
+alwaysApply: false
+---
