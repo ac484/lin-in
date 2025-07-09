@@ -12,7 +12,7 @@ export const routes: Routes = [
     canActivateChild: [authSimpleCanActivateChild],
     data: {},
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: '', redirectTo: 'landing', pathMatch: 'full' },
       {
         path: 'dashboard',
         loadChildren: () => import('./dashboard/routes').then(m => m.routes)
@@ -24,7 +24,9 @@ export const routes: Routes = [
       { path: 'style', loadChildren: () => import('./style/routes').then(m => m.routes) },
       { path: 'delon', loadChildren: () => import('./delon/routes').then(m => m.routes) },
       { path: 'extras', loadChildren: () => import('./extras/routes').then(m => m.routes) },
-      { path: 'pro', loadChildren: () => import('./pro/routes').then(m => m.routes) }
+      { path: 'pro', loadChildren: () => import('./pro/routes').then(m => m.routes) },
+      { path: 'landing', loadChildren: () => import('./landing/routes').then(m => m.routes) },
+      { path: 'finance', loadChildren: () => import('./finance/routes').then(m => m.routes) }
     ]
   },
   // Blak Layout 空白布局
