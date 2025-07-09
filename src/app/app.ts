@@ -3,10 +3,11 @@ import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.scss'
+  template: `
+    <h1>Hello, Angular 19!</h1>
+    <router-outlet />
+  `
 })
-export class App {
-  protected title = 'my-angular-app';
-}
+export class App {}

@@ -20,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes), provideFirebaseApp(() => initializeApp({ projectId: "lin-in", appId: "1:387803341154:web:8d341bbe9176f5e3a78c3b", storageBucket: "lin-in.firebasestorage.app", apiKey: "AIzaSyCX4rENtBHJAxypxNpx5YrFU-gHZl3L2-s", authDomain: "lin-in.firebaseapp.com", messagingSenderId: "387803341154", measurementId: "G-WSPHDVH8TC" })), provideAuth(() => getAuth()), provideAnalytics(() => getAnalytics()), ScreenTrackingService, UserTrackingService, provideAppCheck(() => {
   // TODO get a reCAPTCHA Enterprise here https://console.cloud.google.com/security/recaptcha?project=_
-  const provider = new ReCaptchaEnterpriseProvider(/* reCAPTCHA Enterprise site key */);
+  const provider = new ReCaptchaEnterpriseProvider('6LfZgXwrAAAAABMJ0e0Ym-ZbBuoJU5AFdXJa90am');
   return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
 }), provideFirestore(() => getFirestore()), provideFunctions(() => getFunctions()), provideMessaging(() => getMessaging()), providePerformance(() => getPerformance()), provideStorage(() => getStorage()), provideRemoteConfig(() => getRemoteConfig()), provideVertexAI(() => getVertexAI())
   ]
