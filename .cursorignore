@@ -64,3 +64,10 @@ tsconfig.json
 tsconfig.spec.json
 src/app/workspace/dock/panelmenu
 src/app/workspace/dock/megamenu
+
+storage.rules
+firestore.rules
+/functions
+/src/assets
+firebase.json
+firestore.indexes.json
