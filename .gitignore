@@ -42,8 +42,8 @@ testem.log
 Thumbs.db
 
 # lock
-/pnpm-lock.yaml
-/yarn.lock
+#/pnpm-lock.yaml
+#/yarn.lock
 
 /delon-builds
 

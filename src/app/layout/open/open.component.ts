@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'layout-frontend',
+  selector: 'layout-ui',
   template: `
     <header>
-      <h1>前台網站標題</h1>
+      <h1>前台 UI 樣板</h1>
     </header>
     <main>
       <router-outlet></router-outlet>
@@ -21,4 +21,4 @@ import { RouterOutlet } from '@angular/router';
   `],
   imports: [RouterOutlet]
 })
-export class LayoutFrontendComponent {}
+export class LayoutOpenComponent {}

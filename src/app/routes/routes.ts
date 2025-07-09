@@ -3,13 +3,13 @@ import { startPageGuard } from '@core';
 import { authSimpleCanActivate, authSimpleCanActivateChild } from '@delon/auth';
 
 import { LayoutBasicComponent, LayoutBlankComponent } from '../layout';
-import { LayoutFrontendComponent } from '../layout/frontend/frontend.component';
+import { LayoutOpenComponent } from '../layout/open/open.component';
 
 export const routes: Routes = [
   // ===== 前台主路由（公開頁面，無需登入） =====
   {
     path: '',
-    component: LayoutFrontendComponent,
+    component: LayoutOpenComponent,
     children: [
       { path: 'landing', loadChildren: () => import('../routes/landing/routes').then(m => m.routes) },
       { path: 'finance', loadChildren: () => import('../routes/finance/routes').then(m => m.routes) }
