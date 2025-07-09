@@ -17,6 +17,12 @@ export const routes: Routes = [
     ]
   },
 
+  // ===== 協作平台 HUB 路由（僅此區塊使用 Firebase Auth，因為都是外國用戶） =====
+  {
+    path: 'hub',
+    loadChildren: () => import('./hub/routes').then(m => m.routes)
+  },
+
   // ===== 後台主路由（需登入權限） =====
   {
     path: '',
