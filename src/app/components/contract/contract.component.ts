@@ -10,6 +10,7 @@ import { PrimeNgModule } from '../../shared/modules/prime-ng.module';
 import { FormsModule } from '@angular/forms';
 import { Firestore, collection, addDoc, doc, runTransaction, collectionData, DocumentData, doc as firestoreDoc, updateDoc } from '@angular/fire/firestore';
 import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage';
+import { PdfA4Pipe } from '../../shared/pipes/pdf-a4.pipe';
 
 export interface Contract {
   status: string;
@@ -55,6 +56,7 @@ export class ContractComponent implements OnDestroy {
     });
   }
   uploadingContractCode: string | null = null;
+  private pdfA4Pipe = new PdfA4Pipe();
 
   constructor() {
     inject(AuthService).user$
@@ -116,7 +118,11 @@ export class ContractComponent implements OnDestroy {
   async onContractFileSelected(event: Event, contract: Contract & { id?: string }): Promise<void> {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
-    const file = input.files[0];
+    let file = input.files[0];
+    // 若為 PDF，先統一尺寸
+    if (file.type === 'application/pdf') {
+      file = new File([await this.pdfA4Pipe.transform(file)], file.name, { type: 'application/pdf' });
+    }
     this.uploadingContractCode = contract.code;
     try {
       // 1. 上傳到 Storage
@@ -124,13 +130,11 @@ export class ContractComponent implements OnDestroy {
       const storageRef = ref(this.storage, filePath);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
-
       // 2. 更新 Firestore 合約文件
       if (contract.id) {
         const contractDoc = firestoreDoc(this.firestore, 'contracts', contract.id);
         await updateDoc(contractDoc, { url });
       }
-      // 3. 本地同步（可選，若有即時監聽可省略）
       contract.url = url;
     } finally {
       this.uploadingContractCode = null;
