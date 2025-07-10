@@ -72,8 +72,9 @@ export class AppTopbar {
   menuItems = [
     { label: '首頁', icon: 'pi pi-home', routerLink: '/' },
     { label: '儀表板', icon: 'pi pi-chart-bar', routerLink: '/dashboard' },
-    { label: '關於', icon: 'pi pi-info-circle', routerLink: '/about' },
-    { label: '合約', icon: 'pi pi-file', routerLink: '/contract' }
+    { label: '合約', icon: 'pi pi-file', routerLink: '/contract' },
+    { label: '關於', icon: 'pi pi-info-circle', routerLink: '/about' }
+
   ];
 
   constructor(public auth: AuthService) {}

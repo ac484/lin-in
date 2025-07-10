@@ -2,8 +2,8 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './components/home.component';
 import { DashboardComponent } from './components/dashboard.component';
 import { AboutComponent } from './components/about.component';
-import { PassportComponent } from './components/shared/passport/passport.component';
-import { RegisterComponent } from './components/shared/register/register.component';
+import { PassportComponent } from './shared/components/passport/passport.component';
+import { RegisterComponent } from './shared/components/register/register.component';
 import { ContractComponent } from './components/contract.component';
 
 export const routes: Routes = [
