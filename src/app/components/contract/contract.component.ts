@@ -13,7 +13,7 @@ import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage
 import { PdfA4Pipe } from '../../shared/pipes/pdf-a4.pipe';
 import { TimelineModule } from 'primeng/timeline';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { StepButtonComponent } from './stepbutton/create/stepbutton.component';
+import { StepButtonComponent } from './stepbutton/create/create.component';
 
 export interface PaymentRecord {
   round: number;
