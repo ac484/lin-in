@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 
@@ -24,7 +24,7 @@ import { CommonModule } from '@angular/common';
     </div>
     <div class="flex flex-col gap-1 w-full">
       <div class="text-3xl font-medium leading-tight">
-        {{ stat.value }}
+        {{ i === 0 && totalOrders !== undefined ? totalOrders : (i === 2 && totalRevenue !== undefined ? totalRevenue : stat.value) }}
       </div>
       <div class="text-surface-600 dark:text-surface-400 text-sm leading-tight">
         {{ stat.subtitle }}
@@ -35,6 +35,8 @@ import { CommonModule } from '@angular/common';
   `,
 })
 export class StatsWidget {
+  @Input() totalOrders?: number;
+  @Input() totalRevenue?: number;
 
     stats = [
         {
@@ -62,5 +64,4 @@ export class StatsWidget {
             subtitle: "Last 7 days",
         },
     ];
-
 }

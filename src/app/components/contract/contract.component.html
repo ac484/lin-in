@@ -1,4 +1,6 @@
-<!-- 測試時可先移除 ngIf，確保 Splitter 一定顯示 -->
+<!-- =====================
+  Splitter 主容器
+====================== -->
 <p-splitter
   [panelSizes]="[70, 20, 10]"
   [style]="{ height: '100vh' }"
@@ -7,9 +9,13 @@
   (onResizeStart)="onSplitterResizeStart()"
   (onResizeEnd)="onSplitterResizeEnd()"
 >
-  <!-- Panel 1: 左側 -->
+  
+  <!-- =====================
+    Panel 1: 左側（合約列表 + 組織圖）
+  ====================== -->
   <ng-template #panel>
     <div class="flex flex-col items-center justify-start h-full gap-2">
+      <!-- 組織圖 -->
       <div class="w-full organization-chart-top">
         <p-organizationChart [collapsible]="true" [value]="[selectedContract ? getOrgChartData(selectedContract) : getDefaultOrgChartData()]" styleClass="w-full" >
           <ng-template let-node pTemplate="person">
@@ -20,6 +26,7 @@
           </ng-template>
         </p-organizationChart>
       </div>
+      <!-- 合約列表 Table -->
       <p-table [value]="contracts" styleClass="p-datatable-sm w-full" [tableStyle]="{ 'font-size': '13px' }" [responsiveLayout]="'scroll'"
         selectionMode="single" [(selection)]="selectedContract" dataKey="code" [rowHover]="true"
         (onRowSelect)="onRowSelect($event)">
@@ -96,6 +103,7 @@
                     <span>申請人：{{ p.applicant }}</span>
                     <span *ngIf="p.note">備註：{{ p.note }}</span>
                     <span>狀態：{{ p.status || '未知' }}</span>
+                    <!-- 狀態操作按鈕群 -->
                     <ng-container *ngIf="p.status === '初始'">
                       <button pButton type="button" label="送出申請" icon="pi pi-send" class="p-button-sm ml-2" (click)="toStatus(contract, p, '申請中')"></button>
                     </ng-container>
@@ -118,6 +126,7 @@
                 <ng-template #noPayments>
                   <span>尚無請款紀錄</span>
                 </ng-template>
+                <!-- 狀態進度條 -->
                 <div class="flex flex-col gap-2 mt-2">
                   <div *ngFor="let s of statusList" class="flex items-center gap-2">
                     <span style="min-width: 60px;">{{ s }}</span>
@@ -133,17 +142,22 @@
           </tr>
         </ng-template>
       </p-table>
+      <!-- 建立合約按鈕與對話框 -->
       <button pButton type="button" label="建立合約" (click)="showStepper = true" class="mt-4 w-full"></button>
       <p-dialog [(visible)]="showStepper" [modal]="true" [closable]="true" [dismissableMask]="true" [style]="{width: '480px'}" header="建立合約" (onHide)="showStepper = false">
         <app-stepbutton (contractCreated)="onStepperCreated($event)"></app-stepbutton>
       </p-dialog>
     </div>
   </ng-template>
-  <!-- Panel 2: 中間，垂直再分上下 -->
+
+  <!-- =====================
+    Panel 2: 中間（PDF 預覽 + 備忘）
+  ====================== -->
   <ng-template #panel>
     <p-splitter [stateKey]="'panel2'" layout="vertical" [panelSizes]="[70, 30]"
       (onResizeStart)="onVerticalSplitterResizeStart()"
       (onResizeEnd)="onVerticalSplitterResizeEnd()">
+      <!-- 上：PDF 預覽 -->
       <ng-template #panel [stateKey]="'panel2-top'">
         <div class="flex flex-col items-center justify-center h-full w-full" style="position: relative; height: 100%;">
           <object *ngIf="safeUrl" [data]="safeUrl" type="application/pdf" width="100%" height="100%" style="border: none; display: block;">
@@ -153,6 +167,7 @@
           <div *ngIf="!safeUrl" class="text-gray-500">請選擇有 PDF 檔案的合約</div>
         </div>
       </ng-template>
+      <!-- 下：備忘錄區 -->
       <ng-template #panel [stateKey]="'panel2-bottom'">
         <div class="memo-panel flex flex-col h-full w-full p-2 gap-2">
           <div class="flex-1 overflow-y-auto memo-list">
@@ -188,9 +203,13 @@
       </ng-template>
     </p-splitter>
   </ng-template>
-  <!-- Panel 3: 右側，單一區 -->
+
+  <!-- =====================
+    Panel 3: 右側（歷程/事件紀錄）
+  ====================== -->
   <ng-template #panel [stateKey]="'panel3'">
     <div class="flex flex-col items-center justify-center h-full gap-2 w-full">
+      <!-- 歷程 Timeline -->
       <p-timeline [value]="selectedContract ? getEventTimeline(selectedContract) : []" align="alternate" *ngIf="selectedContract">
         <ng-template pTemplate="content" let-item>
           <div>
@@ -207,6 +226,10 @@
     </div>
   </ng-template>
 </p-splitter>
+
+<!-- =====================
+  請款申請 Dialog
+====================== -->
 <p-dialog [visible]="showRequest !== null" [modal]="true" [closable]="true" header="申請請款" [style]="{width: '400px'}" (onHide)="closeRequestDialog()">
   <form *ngIf="showRequest" (ngSubmit)="submitPayment()" class="flex flex-col gap-4">
     <div class="flex gap-4">
