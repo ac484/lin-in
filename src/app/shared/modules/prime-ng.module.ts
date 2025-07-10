@@ -68,6 +68,8 @@ import { DragDropModule } from 'primeng/dragdrop';
 // PrimeNG 多值標籤模組
 // import { ChipsModule } from 'primeng/chips'; // 若未安裝可先註解
 import { ScrollerModule } from 'primeng/scroller';
+import { SelectModule } from 'primeng/select';
+import { DatePickerModule } from 'primeng/datepicker';
 
 @NgModule({
   imports: [
@@ -105,6 +107,8 @@ import { ScrollerModule } from 'primeng/scroller';
     ContextMenuModule,
     DragDropModule,
     ScrollerModule,
+    SelectModule,
+    DatePickerModule,
   ],
   exports: [
     CommonModule,
@@ -141,6 +145,8 @@ import { ScrollerModule } from 'primeng/scroller';
     ContextMenuModule,
     DragDropModule,
     ScrollerModule,
+    SelectModule,
+    DatePickerModule,
   ]
 })
 export class PrimeNgModule {}

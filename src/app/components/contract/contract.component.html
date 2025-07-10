@@ -1,18 +1,63 @@
 <!-- 測試時可先移除 ngIf，確保 Splitter 一定顯示 -->
-<p-splitter [panelSizes]="[25, 65, 10]" [style]="{ height: '600px' }" class="mb-8">
-         <ng-template #panel>
+<p-splitter [panelSizes]="[25, 65, 10]" [style]="{ height: '100vh' }" class="mb-8">
+         <ng-template #panel [stateKey]="'panel1'">
       <div class="flex flex-col items-center justify-center h-full gap-2">
-        <div class="text-lg font-bold">Panel 1 (左 30%)</div>
-        <div>這是左側內容</div>
+        <p-table [value]="contracts" styleClass="p-datatable-sm w-full" [tableStyle]="{ 'font-size': '13px' }" [responsiveLayout]="'scroll'">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>編號</th>
+              <th>狀態</th>
+              <th>訂單號</th>
+              <th>專案編號</th>
+              <th>工程名稱</th>
+              <th>合約金額</th>
+              <th>已請款金額</th>
+              <th>請款%</th>
+              <th>尚未請款%</th>
+              <th>操作</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-contract let-rowIndex="rowIndex">
+            <tr>
+              <td>{{ contract.code }}</td>
+              <td>{{ contract.status }}</td>
+              <td>{{ contract.orderNo }}</td>
+              <td>{{ contract.projectNo }}</td>
+              <td>{{ contract.projectName }}</td>
+              <td>{{ contract.contractAmount }}</td>
+              <td>{{ contract.invoicedAmount }}</td>
+              <td>{{ contract.paymentPercent }}%</td>
+              <td>{{ contract.pendingPercent }}%</td>
+              <td>
+                <button pButton pRipple icon="pi pi-chevron-down" class="p-button-text p-button-sm" type="button" (click)="contract.expanded = !contract.expanded"></button>
+              </td>
+            </tr>
+            <tr *ngIf="contract.expanded">
+              <td colspan="10">
+                <div class="flex flex-wrap gap-2 items-center">
+                  <span>請款狀態: {{ contract.paymentStatus }}</span>
+                  <span>發票狀態: {{ contract.invoiceStatus }}</span>
+                  <span>第 {{ contract.paymentRound }} 次請款</span>
+                  <span>備註: {{ contract.note }}</span>
+                  <span class="flex items-center">尚未請款:
+                    <input type="range" min="0" max="100" [ngModel]="contract.pendingPercent" class="w-32 align-middle mx-2" disabled />
+                    <span>{{ contract.pendingPercent }}%</span>
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+        <button pButton type="button" label="建立合約" (click)="addContract()" class="mt-4 w-full"></button>
       </div>
     </ng-template>
-    <ng-template #panel>
+    <ng-template #panel [stateKey]="'panel2'">
       <div class="flex flex-col items-center justify-center h-full gap-2">
         <div class="text-lg font-bold">Panel 2 (中 40%)</div>
         <div>這是中間內容</div>
       </div>
     </ng-template>
-    <ng-template #panel>
+    <ng-template #panel [stateKey]="'panel3'">
       <div class="flex flex-col items-center justify-center h-full gap-2">
         <div class="text-lg font-bold">Panel 3 (右 30%)</div>
         <div>這是右側內容</div>
