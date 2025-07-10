@@ -98,15 +98,16 @@ export class ContractComponent implements OnDestroy {
     };
   }
 
+  orgChartExpanded = true; // 控制組織圖展開狀態
+
   getDefaultOrgChartData(): any {
     return {
-      label: '專案團隊',
-      expanded: true,
+      label: this.selectedContract?.projectName || '專案團隊',
+      expanded: this.orgChartExpanded,
       children: [
-        { label: '負責人', type: 'person', data: { name: '王小明', role: '負責人' } },
-        { label: '會計', type: 'person', data: { name: '李會計', role: '會計' } },
-        { label: '專案經理', type: 'person', data: { name: '張經理', role: '專案經理' } },
-        { label: '成員A', type: 'person', data: { name: '陳成員', role: '工程師' } }
+        { label: '角色', type: 'person', data: { name: '', role: '' }, expanded: this.orgChartExpanded },
+        { label: '角色', type: 'person', data: { name: '', role: '' }, expanded: this.orgChartExpanded },
+        { label: '角色', type: 'person', data: { name: '', role: '' }, expanded: this.orgChartExpanded }
       ]
     };
   }
