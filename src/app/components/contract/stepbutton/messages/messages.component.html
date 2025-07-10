@@ -2,7 +2,7 @@
   <div class="flex-1 overflow-y-auto memo-list">
     <ng-container *ngIf="loadingMessages">載入中...</ng-container>
     <ng-container *ngIf="!loadingMessages && messages.length === 0">不想記又怕忘</ng-container>
-    <div *ngFor="let msg of messages" class="memo-item p-2 mb-2 rounded shadow-sm" style="background: var(--surface-0); color: var(--text-color);">
+    <div *ngFor="let msg of messages" class="memo-item p-2 mb-2 rounded shadow-sm">
       <div class="text-xs font-bold mb-1">
         {{ msg.user }}
         <span class="text-xs text-gray-400">
