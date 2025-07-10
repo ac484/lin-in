@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { UserAvatarComponent } from '../../shared/components/user-avatar/user-avatar.component';
 import { SidenavComponent } from '../../shared/components/sidenav/sidenav.component';
 
 @Component({
@@ -10,7 +9,6 @@ import { SidenavComponent } from '../../shared/components/sidenav/sidenav.compon
   imports: [
     RouterOutlet,
     MatToolbarModule,
-    UserAvatarComponent,
     SidenavComponent
   ],
   template: `

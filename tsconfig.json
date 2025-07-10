@@ -23,7 +23,6 @@
     "strictTemplates": true
   },
   "files": [],
-  "baseUrl": "./",
   "paths": {
     "@shared": [
       "src/app/shared/index"
