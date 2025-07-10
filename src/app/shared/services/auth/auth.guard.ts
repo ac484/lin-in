@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
 import { map, take } from 'rxjs/operators';
-import { globalMessageBus } from '../../shared/services/global-message-bus';
+import { globalMessageBus } from '../../services/global-message-bus';
 
 export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService) as AuthService;

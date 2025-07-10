@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { ChartModule } from 'primeng/chart';
 import { CommonModule } from '@angular/common';
-import { LayoutService } from '../../service/layout.service';
+import { LayoutService } from '../../shared/services/layout.service';
 import { debounceTime, Subscription } from 'rxjs';
 
 @Component({

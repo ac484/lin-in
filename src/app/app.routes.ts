@@ -3,7 +3,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { PassportComponent } from './shared/components/passport/passport.component';
 import { RegisterComponent } from './shared/components/register/register.component';
 import { ContractComponent } from './components/contract/contract.component';
-import { authGuard } from './service/auth/auth.guard';
+import { authGuard } from './shared/services/auth/auth.guard';
 
 export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },

@@ -12,7 +12,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
-import { LayoutService } from '../service/layout.service';
+import { LayoutService } from '../shared/services/layout.service';
 
 const presets = {
   Aura,
