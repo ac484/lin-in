@@ -8,7 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-passport',
+  selector: 'app-register',
   standalone: true,
   imports: [
     CommonModule,
@@ -20,8 +20,8 @@ import { CommonModule } from '@angular/common';
   ],
   template: `
     <mat-card style="max-width:360px;margin:48px auto;padding:24px;">
-      <h2>{{ isRegister ? '註冊' : '登入' }}</h2>
-      <form (ngSubmit)="isRegister ? register() : loginWithEmail()" #f="ngForm">
+      <h2>註冊</h2>
+      <form (ngSubmit)="register()" #f="ngForm">
         <mat-form-field style="width:100%">
           <mat-label>Email</mat-label>
           <input matInput [(ngModel)]="email" name="email" required type="email" />
@@ -30,51 +30,25 @@ import { CommonModule } from '@angular/common';
           <mat-label>Password</mat-label>
           <input matInput [(ngModel)]="password" name="password" required type="password" />
         </mat-form-field>
-        <button mat-raised-button color="primary" style="width:100%;margin-bottom:8px;" type="submit">
-          {{ isRegister ? '註冊' : '登入' }}
-        </button>
+        <button mat-raised-button color="primary" style="width:100%;margin-bottom:8px;" type="submit">註冊</button>
       </form>
-      <button mat-stroked-button color="accent" style="width:100%;margin-bottom:8px;" (click)="loginWithGoogle()">Google 登入</button>
-      <button mat-button style="width:100%;" (click)="toggleMode()">
-        {{ isRegister ? '已有帳號？登入' : '沒有帳號？註冊' }}
-      </button>
-      <div *ngIf="success" style="color:green;margin-top:8px;">{{ success }}</div>
+      <div *ngIf="success" style="color:green;margin-top:8px;">註冊成功，請登入！</div>
       <div *ngIf="error" style="color:red;margin-top:8px;">{{error}}</div>
     </mat-card>
   `
 })
-export class PassportComponent {
-  isRegister = false;
+export class RegisterComponent {
   email = '';
   password = '';
   error = '';
-  success = '';
+  success = false;
   constructor(private auth: AuthService) {}
-
-  toggleMode() {
-    this.isRegister = !this.isRegister;
-    this.error = '';
-    this.success = '';
-  }
-
-  loginWithGoogle() {
-    this.error = '';
-    this.success = '';
-    this.auth.loginWithGoogle().catch(e => this.error = e.message);
-  }
-
-  loginWithEmail() {
-    this.error = '';
-    this.success = '';
-    this.auth.loginWithEmail(this.email, this.password)
-      .catch(e => this.error = e.message);
-  }
 
   register() {
     this.error = '';
-    this.success = '';
+    this.success = false;
     this.auth.registerWithEmail(this.email, this.password)
-      .then(() => this.success = '註冊成功，請登入！')
+      .then(() => this.success = true)
       .catch(e => this.error = e.message);
   }
-}
+} 
