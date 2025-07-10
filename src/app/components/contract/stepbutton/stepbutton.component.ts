@@ -21,6 +21,7 @@ export class StepButtonComponent {
   pdfFile: File | null = null;
   uploading = false;
   url = '';
+  step = 1;
   storage = inject(Storage);
 
   onFileSelected(event: Event): void {
@@ -56,6 +57,7 @@ export class StepButtonComponent {
       this.projectName = '';
       this.pdfFile = null;
       this.url = '';
+      this.step = 1;
     }
   }
 } 

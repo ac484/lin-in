@@ -1,26 +1,60 @@
-<p-stepper [linear]="true">
-  <p-step label="基本資料">
-    <div class="flex flex-col gap-4 p-4">
-      <label>訂單號
-        <input pInputText [(ngModel)]="orderNo" required />
-      </label>
-      <label>專案編號
-        <input pInputText [(ngModel)]="projectNo" required />
-      </label>
-      <label>工程名稱
-        <input pInputText [(ngModel)]="projectName" required />
-      </label>
-    </div>
-  </p-step>
-  <p-step label="上傳 PDF">
-    <div class="flex flex-col gap-4 p-4">
-      <input type="file" accept="application/pdf" (change)="onFileSelected($event)" />
-      <button pButton type="button" label="上傳" (click)="uploadPdf()" [disabled]="!pdfFile || uploading"></button>
-      <span *ngIf="uploading" class="text-xs text-gray-500">上傳中...</span>
-      <a *ngIf="url" [href]="url" target="_blank" class="text-blue-600 underline">已上傳，點此預覽</a>
-    </div>
-  </p-step>
-</p-stepper>
-<div class="flex justify-end mt-4">
-  <button pButton type="button" label="完成" (click)="finish()" [disabled]="!orderNo || !projectNo || !projectName || !url"></button>
-</div> 
+<p-stepper [value]="step">
+    <p-step-item [value]="1">
+        <p-step>基本資料</p-step>
+        <p-step-panel>
+            <ng-template #content let-activateCallback="activateCallback">
+                <div class="flex flex-col gap-4 p-4">
+                    <label>訂單編號
+                        <input pInputText [(ngModel)]="orderNo" required />
+                    </label>
+                    <label>專案編號
+                        <input pInputText [(ngModel)]="projectNo" required />
+                    </label>
+                    <label>工程名稱
+                        <input pInputText [(ngModel)]="projectName" required />
+                    </label>
+                </div>
+                <div class="py-6">
+                    <p-button label="Next" (onClick)="activateCallback(2)" [disabled]="!orderNo || !projectNo || !projectName" />
+                </div>
+            </ng-template>
+        </p-step-panel>
+    </p-step-item>
+
+    <p-step-item [value]="2">
+        <p-step>上傳 PDF</p-step>
+        <p-step-panel>
+            <ng-template #content let-activateCallback="activateCallback">
+                <div class="flex flex-col gap-4 p-4">
+                    <input type="file" accept="application/pdf" (change)="onFileSelected($event)" />
+                    <button pButton type="button" label="上傳" (click)="uploadPdf()" [disabled]="!pdfFile || uploading"></button>
+                    <span *ngIf="uploading" class="text-xs text-gray-500">上傳中...</span>
+                    <a *ngIf="url" [href]="url" target="_blank" class="text-blue-600 underline">已上傳，點此預覽</a>
+                </div>
+                <div class="flex py-6 gap-2">
+                    <p-button label="Back" severity="secondary" (onClick)="activateCallback(1)" />
+                    <p-button label="Next" (onClick)="activateCallback(3)" [disabled]="!url" />
+                </div>
+            </ng-template>
+        </p-step-panel>
+    </p-step-item>
+
+    <p-step-item [value]="3">
+        <p-step>完成</p-step>
+        <p-step-panel>
+            <ng-template #content let-activateCallback="activateCallback">
+                <div class="flex flex-col h-48 items-center justify-center">
+                    <div class="font-medium mb-4">請確認資料無誤後送出</div>
+                    <div>訂單編號：{{ orderNo }}</div>
+                    <div>專案編號：{{ projectNo }}</div>
+                    <div>工程名稱：{{ projectName }}</div>
+                    <a *ngIf="url" [href]="url" target="_blank" class="text-blue-600 underline">PDF 預覽</a>
+                </div>
+                <div class="flex py-6 gap-2 justify-end">
+                    <p-button label="Back" severity="secondary" (onClick)="activateCallback(2)" />
+                    <p-button label="完成" (onClick)="finish()" [disabled]="!orderNo || !projectNo || !projectName || !url" />
+                </div>
+            </ng-template>
+        </p-step-panel>
+    </p-step-item>
+</p-stepper> 
