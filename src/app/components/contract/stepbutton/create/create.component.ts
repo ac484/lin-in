@@ -5,6 +5,7 @@ import { StepperModule } from 'primeng/stepper';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage';
+import { PdfA4Pipe } from '../../../../shared/pipes/pdf-a4.pipe';
 
 @Component({
   selector: 'app-stepbutton',
@@ -24,6 +25,7 @@ export class StepButtonComponent {
   step = 1;
   contractAmount: number | null = null;
   storage = inject(Storage);
+  pdfA4Pipe = new PdfA4Pipe();
   members: {name: string; role: string}[] = [
     { name: '', role: '' },
     { name: '', role: '' },
@@ -40,9 +42,13 @@ export class StepButtonComponent {
     if (!this.pdfFile) return;
     this.uploading = true;
     try {
-      const filePath = `contracts/tmp_${Date.now()}_${this.pdfFile.name}`;
+      let file = this.pdfFile;
+      if (file.type === 'application/pdf') {
+        file = new File([await this.pdfA4Pipe.transform(file)], file.name, { type: 'application/pdf' });
+      }
+      const filePath = `contracts/tmp_${Date.now()}_${file.name}`;
       const storageRef = ref(this.storage, filePath);
-      await uploadBytes(storageRef, this.pdfFile);
+      await uploadBytes(storageRef, file);
       this.url = await getDownloadURL(storageRef);
     } finally {
       this.uploading = false;
