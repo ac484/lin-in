@@ -1,2 +1,6 @@
 @use './tailwind.css';
 @use "primeicons/primeicons.css";
+
+body {
+  font-family: 'Press Start 2P', 'Noto Sans TC', 'Microsoft JhengHei', 'PingFang TC', 'Heiti TC', 'sans-serif', ui-monospace, monospace;
+}
