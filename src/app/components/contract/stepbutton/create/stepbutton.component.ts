@@ -14,7 +14,7 @@ import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage
   styleUrls: ['./stepbutton.component.scss']
 })
 export class StepButtonComponent {
-  @Output() contractCreated = new EventEmitter<{ orderNo: string; projectNo: string; projectName: string; url: string }>();
+  @Output() contractCreated = new EventEmitter<{ orderNo: string; projectNo: string; projectName: string; url: string; contractAmount: number }>();
   orderNo = '';
   projectNo = '';
   projectName = '';
@@ -22,6 +22,7 @@ export class StepButtonComponent {
   uploading = false;
   url = '';
   step = 1;
+  contractAmount: number | null = null;
   storage = inject(Storage);
 
   onFileSelected(event: Event): void {
@@ -44,17 +45,19 @@ export class StepButtonComponent {
   }
 
   finish(): void {
-    if (this.orderNo && this.projectNo && this.projectName && this.url) {
+    if (this.orderNo && this.projectNo && this.projectName && this.contractAmount && this.url) {
       this.contractCreated.emit({
         orderNo: this.orderNo,
         projectNo: this.projectNo,
         projectName: this.projectName,
-        url: this.url
+        url: this.url,
+        contractAmount: this.contractAmount
       });
       // 歸零表單
       this.orderNo = '';
       this.projectNo = '';
       this.projectName = '';
+      this.contractAmount = null;
       this.pdfFile = null;
       this.url = '';
       this.step = 1;

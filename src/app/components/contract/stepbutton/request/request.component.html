@@ -1,0 +1,9 @@
+<form (ngSubmit)="submit()" class="flex flex-col gap-4">
+  <label>申請金額
+    <input pInputText type="number" [(ngModel)]="amount" name="amount" required />
+  </label>
+  <label>備註
+    <input pInputText [(ngModel)]="note" name="note" />
+  </label>
+  <button pButton type="submit" label="送出" [disabled]="!amount"></button>
+</form> 

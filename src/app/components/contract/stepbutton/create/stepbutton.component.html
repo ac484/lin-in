@@ -22,6 +22,23 @@
     </p-step-item>
 
     <p-step-item [value]="2">
+        <p-step>合約金額</p-step>
+        <p-step-panel>
+            <ng-template #content let-activateCallback="activateCallback">
+                <div class="flex flex-col gap-4 p-4">
+                    <label>合約金額
+                        <input pInputText type="number" [(ngModel)]="contractAmount" required />
+                    </label>
+                </div>
+                <div class="flex py-6 gap-2">
+                    <p-button label="Back" severity="secondary" (onClick)="activateCallback(1)" />
+                    <p-button label="Next" (onClick)="activateCallback(3)" [disabled]="!contractAmount" />
+                </div>
+            </ng-template>
+        </p-step-panel>
+    </p-step-item>
+
+    <p-step-item [value]="3">
         <p-step>上傳 PDF</p-step>
         <p-step-panel>
             <ng-template #content let-activateCallback="activateCallback">
@@ -31,28 +48,9 @@
                     <span *ngIf="uploading" class="text-xs text-gray-500">上傳中...</span>
                     <a *ngIf="url" [href]="url" target="_blank" class="text-blue-600 underline">已上傳，點此預覽</a>
                 </div>
-                <div class="flex py-6 gap-2">
-                    <p-button label="Back" severity="secondary" (onClick)="activateCallback(1)" />
-                    <p-button label="Next" (onClick)="activateCallback(3)" [disabled]="!url" />
-                </div>
-            </ng-template>
-        </p-step-panel>
-    </p-step-item>
-
-    <p-step-item [value]="3">
-        <p-step>完成</p-step>
-        <p-step-panel>
-            <ng-template #content let-activateCallback="activateCallback">
-                <div class="flex flex-col h-48 items-center justify-center">
-                    <div class="font-medium mb-4">請確認資料無誤後送出</div>
-                    <div>訂單編號：{{ orderNo }}</div>
-                    <div>專案編號：{{ projectNo }}</div>
-                    <div>工程名稱：{{ projectName }}</div>
-                    <a *ngIf="url" [href]="url" target="_blank" class="text-blue-600 underline">PDF 預覽</a>
-                </div>
                 <div class="flex py-6 gap-2 justify-end">
                     <p-button label="Back" severity="secondary" (onClick)="activateCallback(2)" />
-                    <p-button label="完成" (onClick)="finish()" [disabled]="!orderNo || !projectNo || !projectName || !url" />
+                    <p-button label="完成" (onClick)="finish()" [disabled]="!orderNo || !projectNo || !projectName || !contractAmount || !url" />
                 </div>
             </ng-template>
         </p-step-panel>

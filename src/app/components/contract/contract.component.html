@@ -25,7 +25,7 @@
               <th>請款%</th>
               <th>尚未請款%</th>
               <th>操作</th>
-              <th>編輯</th>
+              <th>申請</th>
               <th>檔案</th>
             </tr>
           </ng-template>
@@ -50,11 +50,11 @@
                   詳細
                 </button>
               </td>
-              <!-- 編輯欄 -->
+              <!-- 申請欄 -->
               <td (click)="$event.stopPropagation()">
-                <button pButton type="button" icon="pi pi-pencil" class="p-button-text p-0"
-                  (click)="editContract(contract, $event)">
-                  編輯
+                <button pButton type="button" icon="pi pi-plus-circle" class="p-button-text p-0"
+                  (click)="applyPayment(contract, $event)">
+                  申請
                 </button>
               </td>
               <!-- 檔案欄 -->
@@ -72,25 +72,42 @@
             </tr>
             <tr *ngIf="contract.expanded">
               <td colspan="12">
-                <div class="flex flex-wrap gap-2 items-center">
-                  <span>請款狀態: {{ contract.paymentStatus }}</span>
-                  <span>發票狀態: {{ contract.invoiceStatus }}</span>
-                  <span>第 {{ contract.paymentRound }} 次請款</span>
-                  <span>備註: {{ contract.note }}</span>
-                  <span class="flex items-center">尚未請款:
-                    <input type="range" min="0" max="100" [ngModel]="contract.pendingPercent" class="w-32 align-middle mx-2" disabled />
-                    <span>{{ contract.pendingPercent }}%</span>
-                  </span>
+                <div class="flex flex-col gap-2">
+                  <span>請款紀錄：</span>
+                  <ng-container *ngIf="contract.payments?.length; else noPayments">
+                    <div *ngFor="let p of contract.payments" class="flex gap-4 items-center border-b pb-1">
+                      <span>第{{ p.round }}次</span>
+                      <span>{{ p.date | date:'yyyy/MM/dd HH:mm' }}</span>
+                      <span>金額：{{ p.amount | number:'1.0-0' }}</span>
+                      <span>百分比：{{ p.percent }}%</span>
+                      <span>申請人：{{ p.applicant }}</span>
+                      <span *ngIf="p.note">備註：{{ p.note }}</span>
+                      <span>狀態：{{ p.status || '未知' }}</span>
+                    </div>
+                  </ng-container>
+                  <ng-template #noPayments>
+                    <span>尚無請款紀錄</span>
+                  </ng-template>
+                  <div class="flex flex-wrap gap-2 items-center mt-2">
+                    <span>請款狀態: {{ contract.paymentStatus }}</span>
+                    <span>發票狀態: {{ contract.invoiceStatus }}</span>
+                    <span>第 {{ contract.paymentRound }} 次請款</span>
+                    <span>備註: {{ contract.note }}</span>
+                    <span class="flex items-center">尚未請款:
+                      <input type="range" min="0" max="100" [ngModel]="contract.pendingPercent" class="w-32 align-middle mx-2" disabled />
+                      <span>{{ contract.pendingPercent }}%</span>
+                    </span>
+                  </div>
                 </div>
               </td>
             </tr>
           </ng-template>
         </p-table>
-        <!-- 建立合約按鈕改為 Stepper 彈窗觸發 -->
-        <button *ngIf="!showStepper" pButton type="button" label="建立合約" (click)="showStepper = true" class="mt-4 w-full"></button>
-        <div *ngIf="showStepper" class="mt-4 w-full">
+        <!-- 建立合約按鈕改為 Dialog 彈窗觸發 -->
+        <button pButton type="button" label="建立合約" (click)="showStepper = true" class="mt-4 w-full"></button>
+        <p-dialog [(visible)]="showStepper" [modal]="true" [closable]="true" [dismissableMask]="true" [style]="{width: '480px'}" header="建立合約" (onHide)="showStepper = false">
           <app-stepbutton (contractCreated)="onStepperCreated($event)"></app-stepbutton>
-        </div>
+        </p-dialog>
       </div>
     </ng-template>
   <!-- Panel 2: 中間，垂直再分上下 -->

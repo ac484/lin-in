@@ -13,7 +13,17 @@ import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage
 import { PdfA4Pipe } from '../../shared/pipes/pdf-a4.pipe';
 import { TimelineModule } from 'primeng/timeline';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { StepButtonComponent } from './stepbutton/stepbutton.component';
+import { StepButtonComponent } from './stepbutton/create/stepbutton.component';
+
+export interface PaymentRecord {
+  round: number;
+  date: string;
+  amount: number;
+  percent: number;
+  applicant: string;
+  note?: string;
+  status?: string;
+}
 
 export interface Contract {
   status: string;
@@ -31,6 +41,7 @@ export interface Contract {
   pendingPercent: number;
   note: string;
   url: string; // 檔案下載連結
+  payments?: PaymentRecord[];
 }
 
 @Component({
@@ -188,6 +199,34 @@ export class ContractComponent implements OnDestroy {
   editContract(contract: Contract, event: Event): void {
     event.stopPropagation();
     // TODO: 編輯功能可在此擴充
+  }
+
+  applyPayment(contract: Contract & { id?: string }, event: Event): void {
+    event.stopPropagation();
+    const payments = Array.isArray(contract.payments) ? contract.payments : [];
+    const newRound = payments.length + 1;
+    // 自動計算本次申請金額與百分比
+    const total = contract.contractAmount || 0;
+    // 假設每次平均分配剩餘金額
+    const remain = total - (payments.reduce((sum, p) => sum + (p.amount || 0), 0));
+    const avgAmount = newRound < 10 ? Math.round(remain / (10 - payments.length)) : remain; // 最多10次
+    const percent = total > 0 ? Math.round((avgAmount / total) * 100) : 0;
+    const applicant = typeof this.user === 'object' && this.user && 'displayName' in this.user ? (this.user as any).displayName || '未知' : (this.user as string || '未知');
+    const newRecord: PaymentRecord = {
+      round: newRound,
+      date: new Date().toISOString(),
+      amount: avgAmount,
+      percent,
+      applicant,
+      status: '申請中'
+    };
+    payments.push(newRecord);
+    contract.payments = payments;
+    contract.paymentRound = newRound;
+    if (contract.id) {
+      const contractDoc = firestoreDoc(this.firestore, 'contracts', contract.id);
+      updateDoc(contractDoc, { payments, paymentRound: newRound });
+    }
   }
 
   onSplitterResizeStart(): void {
