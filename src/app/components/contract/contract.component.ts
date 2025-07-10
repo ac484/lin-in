@@ -15,6 +15,7 @@ import { PdfA4Pipe } from '../../shared/pipes/pdf-a4.pipe';
 import { TimelineModule } from 'primeng/timeline';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { StepButtonComponent } from './stepbutton/create/create.component';
+import { OrganizationChartModule } from 'primeng/organizationchart';
 
 export interface PaymentRecord {
   round: number;
@@ -48,7 +49,7 @@ export interface Contract {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, StepButtonComponent],
+  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, StepButtonComponent, OrganizationChartModule],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
@@ -76,6 +77,33 @@ export class ContractComponent implements OnDestroy {
   paymentPercent: number | null = null;
   paymentNote = '';
   readonly statusList: PaymentRecord['status'][] = ['初始','申請中','審核中','開票中','放款中','完成'];
+  // 產生組織圖資料，未來可根據 contract 內容動態產生
+  getOrgChartData(contract: Contract): any {
+    // 範例：根據 contract.projectName 動態顯示
+    return {
+      label: contract.projectName || '專案團隊',
+      expanded: true,
+      children: [
+        { label: '負責人', type: 'person', data: { name: '王小明', role: '負責人' } },
+        { label: '會計', type: 'person', data: { name: '李會計', role: '會計' } },
+        { label: '專案經理', type: 'person', data: { name: '張經理', role: '專案經理' } },
+        { label: '成員A', type: 'person', data: { name: '陳成員', role: '工程師' } }
+      ]
+    };
+  }
+
+  getDefaultOrgChartData(): any {
+    return {
+      label: '專案團隊',
+      expanded: true,
+      children: [
+        { label: '負責人', type: 'person', data: { name: '王小明', role: '負責人' } },
+        { label: '會計', type: 'person', data: { name: '李會計', role: '會計' } },
+        { label: '專案經理', type: 'person', data: { name: '張經理', role: '專案經理' } },
+        { label: '成員A', type: 'person', data: { name: '陳成員', role: '工程師' } }
+      ]
+    };
+  }
 
   constructor() {
     inject(AuthService).user$
