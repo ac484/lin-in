@@ -14,7 +14,6 @@ import { PdfA4Pipe } from '../../shared/pipes/pdf-a4.pipe';
 import { TimelineModule } from 'primeng/timeline';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { StepButtonComponent } from './stepbutton/create/create.component';
-import { RequestComponent } from './stepbutton/request/request.component';
 
 export interface PaymentRecord {
   round: number;
@@ -53,7 +52,7 @@ export interface Contract {
   styleUrls: ['./contract.component.scss']
 })
 export class ContractComponent implements OnDestroy {
-  user: unknown = null;
+  user: any = null; // 明確型別
   loading = true;
   private destroyed$ = new Subject<void>();
   private toastShown = false;
@@ -62,21 +61,14 @@ export class ContractComponent implements OnDestroy {
   firestoreContracts$: Observable<Contract[] | null>;
   _contracts: Contract[] | null = null;
   get contracts(): Contract[] {
-    const arr = this._contracts ?? [];
-    return arr.slice().sort((a, b) => {
-      // code 格式 C-001, C-002...
-      const n1 = parseInt(a.code.replace('C-', ''), 10);
-      const n2 = parseInt(b.code.replace('C-', ''), 10);
-      return n1 - n2;
-    });
+    return (this._contracts ?? []).slice().sort((a, b) => parseInt(a.code.replace('C-', ''), 10) - parseInt(b.code.replace('C-', ''), 10));
   }
   uploadingContractCode: string | null = null;
   selectedContract: Contract | null = null;
   safeUrl: SafeResourceUrl | null = null;
   private pdfA4Pipe = new PdfA4Pipe();
   private sanitizer = inject(DomSanitizer);
-  dragging = false;
-  draggingVertical = false;
+  dragging = false; // 合併 dragging 狀態
   showStepper = false;
   showRequest: Contract | null = null;
   paymentAmount: number | null = null;
@@ -113,10 +105,8 @@ export class ContractComponent implements OnDestroy {
   }
 
   onRowSelect(event: any): void {
-    console.log('Row selected:', event);
     if (event.data) {
       this.selectedContract = event.data as Contract;
-      console.log('Selected contract:', this.selectedContract.code);
       this.updateSafeUrl();
     }
   }
@@ -124,7 +114,6 @@ export class ContractComponent implements OnDestroy {
   selectContract(contract: Contract): void {
     this.selectedContract = contract;
     this.updateSafeUrl();
-    console.log('Manually selected contract:', contract.code);
   }
 
   updateSafeUrl(): void {
@@ -214,19 +203,10 @@ export class ContractComponent implements OnDestroy {
     this.showRequest = null;
   }
 
-  onSplitterResizeStart(): void {
-    this.dragging = true;
-  }
-  onSplitterResizeEnd(): void {
-    this.dragging = false;
-  }
-
-  onVerticalSplitterResizeStart(): void {
-    this.draggingVertical = true;
-  }
-  onVerticalSplitterResizeEnd(): void {
-    this.draggingVertical = false;
-  }
+  onSplitterResizeStart(): void { this.dragging = true; }
+  onSplitterResizeEnd(): void { this.dragging = false; }
+  onVerticalSplitterResizeStart(): void { this.dragging = true; }
+  onVerticalSplitterResizeEnd(): void { this.dragging = false; }
 
   onStepperCreated(data: { orderNo: string; projectNo: string; projectName: string; url: string; contractAmount: number }): void {
     // 建立合約

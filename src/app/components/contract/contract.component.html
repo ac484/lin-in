@@ -7,167 +7,136 @@
   (onResizeStart)="onSplitterResizeStart()"
   (onResizeEnd)="onSplitterResizeEnd()"
 >
-    <!-- Panel 1: 左側 -->
-         <ng-template #panel>
-              <!-- Panel 1 內容 -->
-      <div class="flex flex-col items-center justify-center h-full gap-2">
-        <p-table [value]="contracts" styleClass="p-datatable-sm w-full" [tableStyle]="{ 'font-size': '13px' }" [responsiveLayout]="'scroll'"
-          selectionMode="single" [(selection)]="selectedContract" dataKey="code" [rowHover]="true"
-          (onRowSelect)="onRowSelect($event)">
-          <ng-template pTemplate="header">
-            <tr>
-              <th>編號</th>
-              <th>狀態</th>
-              <th>訂單編號</th>
-              <th>專案編號</th>
-              <th>工程名稱</th>
-              <th>合約金額</th>
-              <th>已請款金額</th>
-              <th>請款%</th>
-              <th>尚未請款%</th>
-              <th>操作</th>
-              <th>申請</th>
-              <th>檔案</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-contract let-rowIndex="rowIndex">
-            <tr [pSelectableRow]="contract" [pSelectableRowIndex]="rowIndex" 
-                class="cursor-pointer hover:bg-gray-50 transition-colors"
-                [class.bg-blue-50]="selectedContract?.code === contract.code"
-                (click)="selectContract(contract)">
-              <td>{{ contract.code }}</td>
-              <td>{{ contract.status }}</td>
-              <td>{{ contract.orderNo }}</td>
-              <td>{{ contract.projectNo }}</td>
-              <td>{{ contract.projectName }}</td>
-              <td>{{ contract.contractAmount }}</td>
-              <td>{{ contract.invoicedAmount }}</td>
-              <td>{{ contract.paymentPercent }}%</td>
-              <td>{{ contract.pendingPercent }}%</td>
-              <!-- 操作欄 -->
-              <td (click)="$event.stopPropagation()">
-                <button pButton type="button" icon="pi pi-info-circle" class="p-button-text p-0"
-                  (click)="toggleExpand(contract, $event)">
-                  詳細
-                </button>
-              </td>
-              <!-- 申請欄 -->
-              <td (click)="$event.stopPropagation()">
-                <button pButton type="button" icon="pi pi-plus-circle" class="p-button-text p-0"
-                  (click)="applyPayment(contract)">
-                  申請
-                </button>
-              </td>
-              <!-- 檔案欄 -->
-              <td (click)="$event.stopPropagation()">
-                <label class="cursor-pointer">
-                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
-                  </svg>
-                  <input type="file" class="hidden" accept="application/pdf,image/*" (change)="onContractFileSelected($event, contract)" [disabled]="!!contract.url || uploadingContractCode === contract.code" />
-                </label>
-                <span *ngIf="uploadingContractCode === contract.code" class="text-xs text-gray-500 ml-2">上傳中...</span>
-                <a *ngIf="contract.url" [href]="contract.url" target="_blank" class="ml-2 text-blue-600 underline">檢視</a>
-              </td>
-            </tr>
-            <tr *ngIf="contract.expanded">
-              <td colspan="12">
-                <div class="flex flex-col gap-2">
-                  <span>請款紀錄：</span>
-                  <ng-container *ngIf="contract.payments?.length; else noPayments">
-                    <div *ngFor="let p of contract.payments" class="flex gap-4 items-center border-b pb-1">
-                      <span>第{{ p.round }}次</span>
-                      <span>{{ p.date | date:'yyyy/MM/dd HH:mm' }}</span>
-                      <span>金額：{{ p.amount | number:'1.0-0' }}</span>
-                      <span>百分比：{{ p.percent }}%</span>
-                      <span>申請人：{{ p.applicant }}</span>
-                      <span *ngIf="p.note">備註：{{ p.note }}</span>
-                      <span>狀態：{{ p.status || '未知' }}</span>
-                    </div>
-                  </ng-container>
-                  <ng-template #noPayments>
-                    <span>尚無請款紀錄</span>
-                  </ng-template>
-                  <div class="flex flex-wrap gap-2 items-center mt-2">
-                    <span>請款狀態: {{ contract.paymentStatus }}</span>
-                    <span>發票狀態: {{ contract.invoiceStatus }}</span>
-                    <span>第 {{ contract.paymentRound }} 次請款</span>
-                    <span>備註: {{ contract.note }}</span>
-                    <span class="flex items-center">尚未請款:
-                      <input type="range" min="0" max="100" [ngModel]="contract.pendingPercent" class="w-32 align-middle mx-2" disabled />
-                      <span>{{ contract.pendingPercent }}%</span>
-                    </span>
+  <!-- Panel 1: 左側 -->
+  <ng-template #panel>
+    <div class="flex flex-col items-center justify-center h-full gap-2">
+      <p-table [value]="contracts" styleClass="p-datatable-sm w-full" [tableStyle]="{ 'font-size': '13px' }" [responsiveLayout]="'scroll'"
+        selectionMode="single" [(selection)]="selectedContract" dataKey="code" [rowHover]="true"
+        (onRowSelect)="onRowSelect($event)">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>編號</th>
+            <th>狀態</th>
+            <th>訂單編號</th>
+            <th>專案編號</th>
+            <th>工程名稱</th>
+            <th>合約金額</th>
+            <th>已請款金額</th>
+            <th>請款%</th>
+            <th>尚未請款%</th>
+            <th>操作</th>
+            <th>申請</th>
+            <th>檔案</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-contract let-rowIndex="rowIndex">
+          <tr [pSelectableRow]="contract" [pSelectableRowIndex]="rowIndex"
+            [class.bg-blue-50]="selectedContract?.code === contract.code"
+            (click)="selectContract(contract)">
+            <td>{{ contract.code }}</td>
+            <td>{{ contract.status }}</td>
+            <td>{{ contract.orderNo }}</td>
+            <td>{{ contract.projectNo }}</td>
+            <td>{{ contract.projectName }}</td>
+            <td>{{ contract.contractAmount }}</td>
+            <td>{{ contract.invoicedAmount }}</td>
+            <td>{{ contract.paymentPercent }}%</td>
+            <td>{{ contract.pendingPercent }}%</td>
+            <td (click)="$event.stopPropagation()">
+              <button pButton type="button" icon="pi pi-info-circle" class="p-button-text p-0"
+                (click)="toggleExpand(contract, $event)">詳細</button>
+            </td>
+            <td (click)="$event.stopPropagation()">
+              <button pButton type="button" icon="pi pi-plus-circle" class="p-button-text p-0"
+                (click)="applyPayment(contract)">申請</button>
+            </td>
+            <td (click)="$event.stopPropagation()">
+              <label class="cursor-pointer">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
+                </svg>
+                <input type="file" class="hidden" accept="application/pdf,image/*" (change)="onContractFileSelected($event, contract)" [disabled]="!!contract.url || uploadingContractCode === contract.code" />
+              </label>
+              <span *ngIf="uploadingContractCode === contract.code" class="text-xs text-gray-500 ml-2">上傳中...</span>
+              <a *ngIf="contract.url" [href]="contract.url" target="_blank" class="ml-2 text-blue-600 underline">檢視</a>
+            </td>
+          </tr>
+          <tr *ngIf="contract.expanded">
+            <td colspan="12">
+              <div class="flex flex-col gap-2">
+                <span>請款紀錄：</span>
+                <ng-container *ngIf="contract.payments?.length; else noPayments">
+                  <div *ngFor="let p of contract.payments" class="flex gap-4 items-center border-b pb-1">
+                    <span>第{{ p.round }}次</span>
+                    <span>{{ p.date | date:'yyyy/MM/dd HH:mm' }}</span>
+                    <span>金額：{{ p.amount | number:'1.0-0' }}</span>
+                    <span>百分比：{{ p.percent }}%</span>
+                    <span>申請人：{{ p.applicant }}</span>
+                    <span *ngIf="p.note">備註：{{ p.note }}</span>
+                    <span>狀態：{{ p.status || '未知' }}</span>
                   </div>
+                </ng-container>
+                <ng-template #noPayments>
+                  <span>尚無請款紀錄</span>
+                </ng-template>
+                <div class="flex flex-wrap gap-2 items-center mt-2">
+                  <span>請款狀態: {{ contract.paymentStatus }}</span>
+                  <span>發票狀態: {{ contract.invoiceStatus }}</span>
+                  <span>第 {{ contract.paymentRound }} 次請款</span>
+                  <span>備註: {{ contract.note }}</span>
+                  <span class="flex items-center">尚未請款:
+                    <input type="range" min="0" max="100" [ngModel]="contract.pendingPercent" class="w-32 align-middle mx-2" disabled />
+                    <span>{{ contract.pendingPercent }}%</span>
+                  </span>
                 </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
-        <!-- 建立合約按鈕改為 Dialog 彈窗觸發 -->
-        <button pButton type="button" label="建立合約" (click)="showStepper = true" class="mt-4 w-full"></button>
-        <p-dialog [(visible)]="showStepper" [modal]="true" [closable]="true" [dismissableMask]="true" [style]="{width: '480px'}" header="建立合約" (onHide)="showStepper = false">
-          <app-stepbutton (contractCreated)="onStepperCreated($event)"></app-stepbutton>
-        </p-dialog>
-      </div>
-    </ng-template>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <button pButton type="button" label="建立合約" (click)="showStepper = true" class="mt-4 w-full"></button>
+      <p-dialog [(visible)]="showStepper" [modal]="true" [closable]="true" [dismissableMask]="true" [style]="{width: '480px'}" header="建立合約" (onHide)="showStepper = false">
+        <app-stepbutton (contractCreated)="onStepperCreated($event)"></app-stepbutton>
+      </p-dialog>
+    </div>
+  </ng-template>
   <!-- Panel 2: 中間，垂直再分上下 -->
-    <ng-template #panel>
-      <p-splitter [stateKey]="'panel2'" layout="vertical" [panelSizes]="[70, 30]"
-        (onResizeStart)="onVerticalSplitterResizeStart()"
-        (onResizeEnd)="onVerticalSplitterResizeEnd()">
-        <ng-template #panel [stateKey]="'panel2-top'">
-          <div class="flex flex-col items-center justify-center h-full w-full" 
-            style="position: relative; height: 100%;">
-            <!--
-              下方 object 標籤與外層 div 設定 height: 100%、width: 100%，
-              目的是讓 PDF 預覽區塊能與 Splitter 面板上下左右完全貼合，
-              避免出現多餘空白。
-              object 標籤：width="100%"（左右貼合），height="100%"（上下貼合），
-              style="border: none; display: block;"（移除預設邊框，確保無空隙）
-              遮罩 div 也需 height/width 100% 才能完全覆蓋 PDF 區塊。
-            -->
-            <object
-              *ngIf="safeUrl"
-              [data]="safeUrl"
-              type="application/pdf"
-              width="100%"
-              height="100%"
-              style="border: none; display: block;"
-            >
-              <div>無法預覽 PDF，請<a [href]="safeUrl" target="_blank" class="text-blue-600 underline">下載檔案</a>。</div>
-            </object>
-            <div
-              *ngIf="dragging || draggingVertical"
-              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: transparent; cursor: move;"
-            ></div>
-            <div *ngIf="!safeUrl" class="text-gray-500">
-              請選擇有 PDF 檔案的合約
-            </div>
+  <ng-template #panel>
+    <p-splitter [stateKey]="'panel2'" layout="vertical" [panelSizes]="[70, 30]"
+      (onResizeStart)="onVerticalSplitterResizeStart()"
+      (onResizeEnd)="onVerticalSplitterResizeEnd()">
+      <ng-template #panel [stateKey]="'panel2-top'">
+        <div class="flex flex-col items-center justify-center h-full w-full" style="position: relative; height: 100%;">
+          <object *ngIf="safeUrl" [data]="safeUrl" type="application/pdf" width="100%" height="100%" style="border: none; display: block;">
+            <div>無法預覽 PDF，請<a [href]="safeUrl" target="_blank" class="text-blue-600 underline">下載檔案</a>。</div>
+          </object>
+          <div *ngIf="dragging" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: transparent; cursor: move;"></div>
+          <div *ngIf="!safeUrl" class="text-gray-500">請選擇有 PDF 檔案的合約</div>
+        </div>
+      </ng-template>
+      <ng-template #panel [stateKey]="'panel2-bottom'">
+        <!-- 下半部內容（可留空或自訂） -->
+      </ng-template>
+    </p-splitter>
+  </ng-template>
+  <!-- Panel 3: 右側，單一區 -->
+  <ng-template #panel [stateKey]="'panel3'">
+    <div class="flex flex-col items-center justify-center h-full gap-2 w-full">
+      <p-timeline [value]="selectedContract ? [selectedContract] : []" align="alternate" *ngIf="selectedContract">
+        <ng-template pTemplate="content" let-item>
+          <div>
+            <div>合約編號：{{ item.code }}</div>
+            <div>狀態：{{ item.status }}</div>
+            <div>專案名稱：{{ item.projectName }}</div>
+            <div *ngIf="item.url"><a [href]="item.url" target="_blank" class="text-blue-600 underline">檢視檔案</a></div>
           </div>
         </ng-template>
-        <ng-template #panel [stateKey]="'panel2-bottom'">
-              <!-- 下半部內容（可留空或自訂） -->
-        </ng-template>
-      </p-splitter>
-    </ng-template>
-  <!-- Panel 3: 右側，單一區 -->
-    <ng-template #panel [stateKey]="'panel3'">
-      <div class="flex flex-col items-center justify-center h-full gap-2 w-full">
-        <p-timeline [value]="selectedContract ? [selectedContract] : []" align="alternate" *ngIf="selectedContract">
-          <ng-template pTemplate="content" let-item>
-            <div>
-              <div>合約編號：{{ item.code }}</div>
-              <div>狀態：{{ item.status }}</div>
-              <div>專案名稱：{{ item.projectName }}</div>
-              <div *ngIf="item.url"><a [href]="item.url" target="_blank" class="text-blue-600 underline">檢視檔案</a></div>
-            </div>
-          </ng-template>
-        </p-timeline>
-        <div *ngIf="!selectedContract" class="text-gray-500">請選擇合約以檢視歷程</div>
-      </div>
-    </ng-template>
-  </p-splitter>
+      </p-timeline>
+      <div *ngIf="!selectedContract" class="text-gray-500">請選擇合約以檢視歷程</div>
+    </div>
+  </ng-template>
+</p-splitter>
 <p-dialog [visible]="showRequest !== null" [modal]="true" [closable]="true" header="申請請款" [style]="{width: '400px'}" (onHide)="closeRequestDialog()">
   <form *ngIf="showRequest" (ngSubmit)="submitPayment()" class="flex flex-col gap-4">
     <div class="flex gap-4">
