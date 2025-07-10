@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { Firestore, collection, addDoc, doc, runTransaction, collectionData, DocumentData, doc as firestoreDoc, updateDoc } from '@angular/fire/firestore';
 import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage';
 import { PdfA4Pipe } from '../../shared/pipes/pdf-a4.pipe';
+import { TimelineModule } from 'primeng/timeline';
 
 export interface Contract {
   status: string;
@@ -33,7 +34,7 @@ export interface Contract {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, SplitterModule, PrimeNgModule, FormsModule],
+  imports: [CommonModule, SplitterModule, PrimeNgModule, FormsModule, TimelineModule],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
@@ -56,6 +57,7 @@ export class ContractComponent implements OnDestroy {
     });
   }
   uploadingContractCode: string | null = null;
+  selectedContract: Contract | null = null;
   private pdfA4Pipe = new PdfA4Pipe();
 
   constructor() {

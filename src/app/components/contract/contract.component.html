@@ -1,8 +1,11 @@
 <!-- 測試時可先移除 ngIf，確保 Splitter 一定顯示 -->
 <p-splitter [panelSizes]="[25, 65, 10]" [style]="{ height: '100vh' }" class="mb-8">
+    <!-- Panel 1: 左側 -->
          <ng-template #panel [stateKey]="'panel1'">
+              <!-- Panel 1 內容 -->
       <div class="flex flex-col items-center justify-center h-full gap-2">
-        <p-table [value]="contracts" styleClass="p-datatable-sm w-full" [tableStyle]="{ 'font-size': '13px' }" [responsiveLayout]="'scroll'">
+        <p-table [value]="contracts" styleClass="p-datatable-sm w-full" [tableStyle]="{ 'font-size': '13px' }" [responsiveLayout]="'scroll'"
+          selectionMode="single" [(selection)]="selectedContract" dataKey="code">
           <ng-template pTemplate="header">
             <tr>
               <th>編號</th>
@@ -59,16 +62,33 @@
         <button pButton type="button" label="建立合約" (click)="addContract()" class="mt-4 w-full"></button>
       </div>
     </ng-template>
+  <!-- Panel 2: 中間，垂直再分上下 -->
     <ng-template #panel [stateKey]="'panel2'">
-      <div class="flex flex-col items-center justify-center h-full gap-2">
-        <div class="text-lg font-bold">Panel 2 (中 40%)</div>
-        <div>這是中間內容</div>
+      <p-splitter layout="vertical" [panelSizes]="[50, 50]">
+        <ng-template #panel [stateKey]="'panel2-top'">
+                  <!-- 上半部內容 -->
+          <div class="flex flex-col items-center justify-center h-full gap-2">
       </div>
     </ng-template>
+    <ng-template #panel [stateKey]="'panel2-bottom'">
+              <!-- 下半部內容 -->
+    </ng-template>
+  </p-splitter>
+</ng-template>
+  <!-- Panel 3: 右側，單一區 -->
     <ng-template #panel [stateKey]="'panel3'">
-      <div class="flex flex-col items-center justify-center h-full gap-2">
-        <div class="text-lg font-bold">Panel 3 (右 30%)</div>
-        <div>這是右側內容</div>
+      <div class="flex flex-col items-center justify-center h-full gap-2 w-full">
+        <p-timeline [value]="selectedContract ? [selectedContract] : []" align="alternate" *ngIf="selectedContract">
+          <ng-template pTemplate="content" let-item>
+            <div>
+              <div>合約編號：{{ item.code }}</div>
+              <div>狀態：{{ item.status }}</div>
+              <div>專案名稱：{{ item.projectName }}</div>
+              <div *ngIf="item.url"><a [href]="item.url" target="_blank" class="text-blue-600 underline">檢視檔案</a></div>
+            </div>
+          </ng-template>
+        </p-timeline>
+        <div *ngIf="!selectedContract" class="text-gray-500">請選擇合約以檢視歷程</div>
       </div>
     </ng-template>
   </p-splitter>
