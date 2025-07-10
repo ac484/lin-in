@@ -28,7 +28,7 @@ export interface Contract {
   invoiceStatus: string;
   pendingPercent: number;
   note: string;
-  url?: string; // 檔案下載連結
+  url: string; // 檔案下載連結
 }
 
 @Component({
@@ -84,6 +84,11 @@ export class ContractComponent implements OnDestroy {
     this.firestoreContracts$.pipe(takeUntil(this.destroyed$)).subscribe(data => { this._contracts = data; });
   }
 
+  isPdfUrl(url: string): boolean {
+    // 檢查URL是否包含.pdf，不管是否有查詢參數
+    return url.includes('.pdf');
+  }
+
   async addContract(): Promise<void> {
     // 取得並遞增 contract_serial
     const serialDoc = doc(this.firestore, 'meta/contract_serial');
@@ -111,7 +116,8 @@ export class ContractComponent implements OnDestroy {
         paymentStatus: '未請款',
         invoiceStatus: '未開立',
         pendingPercent: 100,
-        note: ''
+        note: '',
+        url: ''
       };
       transaction.set(doc(contractsCol), contract);
     });

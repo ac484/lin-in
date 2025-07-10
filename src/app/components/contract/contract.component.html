@@ -37,7 +37,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
                   </svg>
-                  <input type="file" class="hidden" accept="image/*" (change)="onContractFileSelected($event, contract)" [disabled]="!!contract.url || uploadingContractCode === contract.code" />
+                  <input type="file" class="hidden" accept="application/pdf,image/*" (change)="onContractFileSelected($event, contract)" [disabled]="!!contract.url || uploadingContractCode === contract.code" />
                 </label>
                 <span *ngIf="uploadingContractCode === contract.code" class="text-xs text-gray-500 ml-2">上傳中...</span>
                 <a *ngIf="contract.url" [href]="contract.url" target="_blank" class="ml-2 text-blue-600 underline">檢視</a>
@@ -64,20 +64,24 @@
     </ng-template>
   <!-- Panel 2: 中間，垂直再分上下 -->
     <ng-template #panel [stateKey]="'panel2'">
-      <p-splitter layout="vertical" [panelSizes]="[50, 50]">
+      <p-splitter layout="vertical" [panelSizes]="[70, 30]">
         <ng-template #panel [stateKey]="'panel2-top'">
                   <!-- 上半部內容 -->
           <div class="flex flex-col items-center justify-center h-full w-full">
-            <ng-container *ngIf="(selectedContract?.url ?? '').endsWith('.pdf'); else noPdf">
+            <ng-container *ngIf="selectedContract && selectedContract.url && isPdfUrl(selectedContract.url); else noPdf">
               <iframe
-                [attr.src]="selectedContract?.url || ''"
+                [attr.src]="selectedContract.url"
                 width="100%"
                 height="500"
                 style="border: none;"
               ></iframe>
             </ng-container>
             <ng-template #noPdf>
-              <div class="text-gray-500">請選擇有 PDF 檔案的合約</div>
+              <div class="text-gray-500">
+                <div *ngIf="!selectedContract">請選擇合約</div>
+                <div *ngIf="selectedContract && !selectedContract.url">請上傳PDF檔案</div>
+                <div *ngIf="selectedContract && selectedContract.url && !isPdfUrl(selectedContract.url)">請上傳PDF格式檔案</div>
+              </div>
             </ng-template>
           </div>
         </ng-template>
