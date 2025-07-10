@@ -13,6 +13,7 @@ import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage
 import { PdfA4Pipe } from '../../shared/pipes/pdf-a4.pipe';
 import { TimelineModule } from 'primeng/timeline';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { StepButtonComponent } from './stepbutton/stepbutton.component';
 
 export interface Contract {
   status: string;
@@ -35,7 +36,7 @@ export interface Contract {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, SplitterModule, PrimeNgModule, FormsModule, TimelineModule],
+  imports: [CommonModule, SplitterModule, PrimeNgModule, FormsModule, TimelineModule, StepButtonComponent],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
@@ -64,6 +65,7 @@ export class ContractComponent implements OnDestroy {
   private sanitizer = inject(DomSanitizer);
   dragging = false;
   draggingVertical = false;
+  showStepper = false;
 
   constructor() {
     inject(AuthService).user$
@@ -183,6 +185,11 @@ export class ContractComponent implements OnDestroy {
     (contract as any).expanded = !(contract as any).expanded;
   }
 
+  editContract(contract: Contract, event: Event): void {
+    event.stopPropagation();
+    // TODO: 編輯功能可在此擴充
+  }
+
   onSplitterResizeStart(): void {
     this.dragging = true;
   }
@@ -195,6 +202,41 @@ export class ContractComponent implements OnDestroy {
   }
   onVerticalSplitterResizeEnd(): void {
     this.draggingVertical = false;
+  }
+
+  onStepperCreated(data: { orderNo: string; projectNo: string; projectName: string; url: string }): void {
+    // 建立合約
+    const serialDoc = doc(this.firestore, 'meta/contract_serial');
+    const contractsCol = collection(this.firestore, 'contracts');
+    runTransaction(this.firestore, async (transaction) => {
+      const serialSnap = await transaction.get(serialDoc);
+      let current = 1;
+      if (serialSnap.exists()) {
+        const d = serialSnap.data() as { current: number };
+        current = d.current + 1;
+      }
+      transaction.set(serialDoc, { current }, { merge: true });
+      const code = `C-${current.toString().padStart(3, '0')}`;
+      const contract: Contract = {
+        status: '新建',
+        code,
+        orderNo: data.orderNo,
+        orderDate: '',
+        projectNo: data.projectNo,
+        projectName: data.projectName,
+        contractAmount: 0,
+        invoicedAmount: 0,
+        paymentRound: 1,
+        paymentPercent: 0,
+        paymentStatus: '未請款',
+        invoiceStatus: '未開立',
+        pendingPercent: 100,
+        note: '',
+        url: data.url
+      };
+      transaction.set(doc(contractsCol), contract);
+    });
+    this.showStepper = false;
   }
 
   ngOnDestroy() {

@@ -10,8 +10,8 @@ import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage
   selector: 'app-stepbutton',
   standalone: true,
   imports: [CommonModule, StepperModule, ButtonModule, FormsModule],
-  templateUrl: './stepbutton.component.html',
-  styleUrls: ['./stepbutton.component.scss']
+  templateUrl: './stepbutton/stepbutton.component.html',
+  styleUrls: ['./stepbutton/stepbutton.component.scss']
 })
 export class StepButtonComponent {
   @Output() contractCreated = new EventEmitter<{ orderNo: string; projectNo: string; projectName: string; url: string }>();

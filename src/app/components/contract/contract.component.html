@@ -1,6 +1,6 @@
 <!-- 測試時可先移除 ngIf，確保 Splitter 一定顯示 -->
 <p-splitter
-  [panelSizes]="[25, 65, 10]"
+  [panelSizes]="[70, 20, 10]"
   [style]="{ height: '100vh' }"
   class="mb-8"
   (onResizeStart)="onSplitterResizeStart()"
@@ -24,8 +24,9 @@
               <th>已請款金額</th>
               <th>請款%</th>
               <th>尚未請款%</th>
-              <th>檔案</th>
               <th>操作</th>
+              <th>編輯</th>
+              <th>檔案</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-contract let-rowIndex="rowIndex">
@@ -42,6 +43,20 @@
               <td>{{ contract.invoicedAmount }}</td>
               <td>{{ contract.paymentPercent }}%</td>
               <td>{{ contract.pendingPercent }}%</td>
+              <!-- 操作欄 -->
+              <td (click)="$event.stopPropagation()">
+                <button pButton type="button" icon="pi pi-info-circle" class="p-button-text p-0"
+                  (click)="toggleExpand(contract, $event)">
+                  詳細
+                </button>
+              </td>
+              <!-- 編輯欄 -->
+              <td (click)="$event.stopPropagation()">
+                <button pButton type="button" icon="pi pi-pencil" class="p-button-text p-0"
+                  (click)="editContract(contract, $event)">
+                  編輯
+                </button>
+              </td>
               <!-- 檔案欄 -->
               <td (click)="$event.stopPropagation()">
                 <label class="cursor-pointer">
@@ -54,16 +69,9 @@
                 <span *ngIf="uploadingContractCode === contract.code" class="text-xs text-gray-500 ml-2">上傳中...</span>
                 <a *ngIf="contract.url" [href]="contract.url" target="_blank" class="ml-2 text-blue-600 underline">檢視</a>
               </td>
-              <!-- 操作欄 -->
-              <td (click)="$event.stopPropagation()">
-                <button pButton type="button" icon="pi pi-info-circle" class="p-button-text p-0"
-                  (click)="toggleExpand(contract, $event)">
-                  詳細
-                </button>
-              </td>
             </tr>
             <tr *ngIf="contract.expanded">
-              <td colspan="11">
+              <td colspan="12">
                 <div class="flex flex-wrap gap-2 items-center">
                   <span>請款狀態: {{ contract.paymentStatus }}</span>
                   <span>發票狀態: {{ contract.invoiceStatus }}</span>
@@ -78,7 +86,11 @@
             </tr>
           </ng-template>
         </p-table>
-        <button pButton type="button" label="建立合約" (click)="addContract()" class="mt-4 w-full"></button>
+        <!-- 建立合約按鈕改為 Stepper 彈窗觸發 -->
+        <button *ngIf="!showStepper" pButton type="button" label="建立合約" (click)="showStepper = true" class="mt-4 w-full"></button>
+        <div *ngIf="showStepper" class="mt-4 w-full">
+          <app-stepbutton (contractCreated)="onStepperCreated($event)"></app-stepbutton>
+        </div>
       </div>
     </ng-template>
   <!-- Panel 2: 中間，垂直再分上下 -->

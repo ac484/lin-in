@@ -1,0 +1,26 @@
+<p-stepper [linear]="true">
+  <p-step label="基本資料">
+    <div class="flex flex-col gap-4 p-4">
+      <label>訂單號
+        <input pInputText [(ngModel)]="orderNo" required />
+      </label>
+      <label>專案編號
+        <input pInputText [(ngModel)]="projectNo" required />
+      </label>
+      <label>工程名稱
+        <input pInputText [(ngModel)]="projectName" required />
+      </label>
+    </div>
+  </p-step>
+  <p-step label="上傳 PDF">
+    <div class="flex flex-col gap-4 p-4">
+      <input type="file" accept="application/pdf" (change)="onFileSelected($event)" />
+      <button pButton type="button" label="上傳" (click)="uploadPdf()" [disabled]="!pdfFile || uploading"></button>
+      <span *ngIf="uploading" class="text-xs text-gray-500">上傳中...</span>
+      <a *ngIf="url" [href]="url" target="_blank" class="text-blue-600 underline">已上傳，點此預覽</a>
+    </div>
+  </p-step>
+</p-stepper>
+<div class="flex justify-end mt-4">
+  <button pButton type="button" label="完成" (click)="finish()" [disabled]="!orderNo || !projectNo || !projectName || !url"></button>
+</div> 

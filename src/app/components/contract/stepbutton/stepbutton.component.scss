@@ -1,0 +1,31 @@
+/* StepButtonComponent 極簡樣式 */
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.gap-4 {
+  gap: 1rem;
+}
+.p-4 {
+  padding: 1rem;
+}
+.justify-end {
+  justify-content: flex-end;
+}
+.mt-4 {
+  margin-top: 1rem;
+}
+.text-xs {
+  font-size: 0.75rem;
+}
+.text-gray-500 {
+  color: #6b7280;
+}
+.text-blue-600 {
+  color: #2563eb;
+}
+.underline {
+  text-decoration: underline;
+} 
