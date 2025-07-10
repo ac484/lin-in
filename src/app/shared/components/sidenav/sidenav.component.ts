@@ -1,0 +1,36 @@
+import { Component } from '@angular/core';
+import { MatListModule } from '@angular/material/list';
+import { MatIconModule } from '@angular/material/icon';
+import { RouterModule } from '@angular/router';
+
+@Component({
+  selector: 'app-sidenav',
+  standalone: true,
+  imports: [MatListModule, MatIconModule, RouterModule],
+  template: `
+    <mat-nav-list>
+      <a mat-list-item routerLink="/open" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon>lock_open</mat-icon>
+      </a>
+      <a mat-list-item routerLink="/blank" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon>crop_square</mat-icon>
+      </a>
+      <a mat-list-item routerLink="/basic" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon>dashboard</mat-icon>
+      </a>
+    </mat-nav-list>
+    <style>
+      .active-link {
+        background: rgba(25, 118, 210, 0.12);
+        color: #1976d2;
+      }
+      a.mat-list-item {
+        justify-content: center;
+      }
+      mat-icon {
+        font-size: 28px;
+      }
+    </style>
+  `
+})
+export class SidenavComponent {} 

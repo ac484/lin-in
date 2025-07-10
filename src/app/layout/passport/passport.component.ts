@@ -6,6 +6,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-passport',
@@ -49,7 +51,7 @@ export class PassportComponent {
   password = '';
   error = '';
   success = '';
-  constructor(private auth: AuthService) {}
+  constructor(private auth: AuthService, private router: Router) {}
 
   toggleMode() {
     this.isRegister = !this.isRegister;
@@ -60,13 +62,16 @@ export class PassportComponent {
   loginWithGoogle() {
     this.error = '';
     this.success = '';
-    this.auth.loginWithGoogle().catch(e => this.error = e.message);
+    this.auth.loginWithGoogle()
+      .then(() => this.router.navigate(['/basic']))
+      .catch(e => this.error = e.message);
   }
 
   loginWithEmail() {
     this.error = '';
     this.success = '';
     this.auth.loginWithEmail(this.email, this.password)
+      .then(() => this.router.navigate(['/basic']))
       .catch(e => this.error = e.message);
   }
 
