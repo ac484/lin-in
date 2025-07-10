@@ -1,5 +1,11 @@
 <!-- 測試時可先移除 ngIf，確保 Splitter 一定顯示 -->
-<p-splitter [panelSizes]="[25, 65, 10]" [style]="{ height: '100vh' }" class="mb-8">
+<p-splitter
+  [panelSizes]="[25, 65, 10]"
+  [style]="{ height: '100vh' }"
+  class="mb-8"
+  (onResizeStart)="onSplitterResizeStart()"
+  (onResizeEnd)="onSplitterResizeEnd()"
+>
     <!-- Panel 1: 左側 -->
          <ng-template #panel [stateKey]="'panel1'">
               <!-- Panel 1 內容 -->
@@ -70,14 +76,22 @@
     <ng-template #panel [stateKey]="'panel2'">
       <p-splitter layout="vertical" [panelSizes]="[70, 30]">
         <ng-template #panel [stateKey]="'panel2-top'">
-          <div class="flex flex-col items-center justify-center h-full w-full">
-            <iframe
+          <div class="flex flex-col items-center justify-center h-full w-full" style="position: relative;">
+            <object
               *ngIf="safeUrl"
-              [src]="safeUrl"
+              [data]="safeUrl"
+              type="application/pdf"
               width="100%"
-              height="500"
+              height="500px"
               style="border: none;"
-            ></iframe>
+            >
+              <div>無法預覽 PDF，請<a [href]="safeUrl" target="_blank" class="text-blue-600 underline">下載檔案</a>。</div>
+            </object>
+            <!-- 拖曳時顯示遮罩 -->
+            <div
+              *ngIf="dragging"
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: transparent; cursor: col-resize;"
+            ></div>
             <div *ngIf="!safeUrl" class="text-gray-500">
               請選擇有 PDF 檔案的合約
             </div>

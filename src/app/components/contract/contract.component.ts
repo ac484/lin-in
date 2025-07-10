@@ -62,6 +62,7 @@ export class ContractComponent implements OnDestroy {
   safeUrl: SafeResourceUrl | null = null;
   private pdfA4Pipe = new PdfA4Pipe();
   private sanitizer = inject(DomSanitizer);
+  dragging = false;
 
   constructor() {
     inject(AuthService).user$
@@ -174,6 +175,13 @@ export class ContractComponent implements OnDestroy {
       this.uploadingContractCode = null;
       input.value = '';
     }
+  }
+
+  onSplitterResizeStart(): void {
+    this.dragging = true;
+  }
+  onSplitterResizeEnd(): void {
+    this.dragging = false;
   }
 
   ngOnDestroy() {
