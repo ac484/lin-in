@@ -3,11 +3,12 @@
   [panelSizes]="[70, 20, 10]"
   [style]="{ height: '100vh' }"
   class="mb-8"
+  [stateKey]="'panel1'"
   (onResizeStart)="onSplitterResizeStart()"
   (onResizeEnd)="onSplitterResizeEnd()"
 >
     <!-- Panel 1: 左側 -->
-         <ng-template #panel [stateKey]="'panel1'">
+         <ng-template #panel>
               <!-- Panel 1 內容 -->
       <div class="flex flex-col items-center justify-center h-full gap-2">
         <p-table [value]="contracts" styleClass="p-datatable-sm w-full" [tableStyle]="{ 'font-size': '13px' }" [responsiveLayout]="'scroll'"
@@ -53,7 +54,7 @@
               <!-- 申請欄 -->
               <td (click)="$event.stopPropagation()">
                 <button pButton type="button" icon="pi pi-plus-circle" class="p-button-text p-0"
-                  (click)="applyPayment(contract, $event)">
+                  (click)="applyPayment(contract)">
                   申請
                 </button>
               </td>
@@ -111,8 +112,8 @@
       </div>
     </ng-template>
   <!-- Panel 2: 中間，垂直再分上下 -->
-    <ng-template #panel [stateKey]="'panel2'">
-      <p-splitter layout="vertical" [panelSizes]="[70, 30]"
+    <ng-template #panel>
+      <p-splitter [stateKey]="'panel2'" layout="vertical" [panelSizes]="[70, 30]"
         (onResizeStart)="onVerticalSplitterResizeStart()"
         (onResizeEnd)="onVerticalSplitterResizeEnd()">
         <ng-template #panel [stateKey]="'panel2-top'">
@@ -167,3 +168,10 @@
       </div>
     </ng-template>
   </p-splitter>
+<p-dialog [visible]="showRequest !== null" [modal]="true" header="申請請款" [style]="{width: '400px'}" (onHide)="showRequest = null">
+  <app-request
+    *ngIf="showRequest"
+    [contract]="showRequest"
+    (paymentCreated)="showRequest = null">
+  </app-request>
+</p-dialog>

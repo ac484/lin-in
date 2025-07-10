@@ -14,6 +14,7 @@ import { PdfA4Pipe } from '../../shared/pipes/pdf-a4.pipe';
 import { TimelineModule } from 'primeng/timeline';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { StepButtonComponent } from './stepbutton/create/create.component';
+import { RequestComponent } from './stepbutton/request/request.component';
 
 export interface PaymentRecord {
   round: number;
@@ -47,7 +48,7 @@ export interface Contract {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, SplitterModule, PrimeNgModule, FormsModule, TimelineModule, StepButtonComponent],
+  imports: [CommonModule, SplitterModule, PrimeNgModule, FormsModule, TimelineModule, StepButtonComponent, RequestComponent],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
@@ -77,6 +78,7 @@ export class ContractComponent implements OnDestroy {
   dragging = false;
   draggingVertical = false;
   showStepper = false;
+  showRequest: Contract | null = null;
 
   constructor() {
     inject(AuthService).user$
@@ -201,32 +203,8 @@ export class ContractComponent implements OnDestroy {
     // TODO: 編輯功能可在此擴充
   }
 
-  applyPayment(contract: Contract & { id?: string }, event: Event): void {
-    event.stopPropagation();
-    const payments = Array.isArray(contract.payments) ? contract.payments : [];
-    const newRound = payments.length + 1;
-    // 自動計算本次申請金額與百分比
-    const total = contract.contractAmount || 0;
-    // 假設每次平均分配剩餘金額
-    const remain = total - (payments.reduce((sum, p) => sum + (p.amount || 0), 0));
-    const avgAmount = newRound < 10 ? Math.round(remain / (10 - payments.length)) : remain; // 最多10次
-    const percent = total > 0 ? Math.round((avgAmount / total) * 100) : 0;
-    const applicant = typeof this.user === 'object' && this.user && 'displayName' in this.user ? (this.user as any).displayName || '未知' : (this.user as string || '未知');
-    const newRecord: PaymentRecord = {
-      round: newRound,
-      date: new Date().toISOString(),
-      amount: avgAmount,
-      percent,
-      applicant,
-      status: '申請中'
-    };
-    payments.push(newRecord);
-    contract.payments = payments;
-    contract.paymentRound = newRound;
-    if (contract.id) {
-      const contractDoc = firestoreDoc(this.firestore, 'contracts', contract.id);
-      updateDoc(contractDoc, { payments, paymentRound: newRound });
-    }
+  applyPayment(contract: Contract): void {
+    this.showRequest = contract;
   }
 
   onSplitterResizeStart(): void {
@@ -243,7 +221,7 @@ export class ContractComponent implements OnDestroy {
     this.draggingVertical = false;
   }
 
-  onStepperCreated(data: { orderNo: string; projectNo: string; projectName: string; url: string }): void {
+  onStepperCreated(data: { orderNo: string; projectNo: string; projectName: string; url: string; contractAmount: number }): void {
     // 建立合約
     const serialDoc = doc(this.firestore, 'meta/contract_serial');
     const contractsCol = collection(this.firestore, 'contracts');
@@ -263,7 +241,7 @@ export class ContractComponent implements OnDestroy {
         orderDate: '',
         projectNo: data.projectNo,
         projectName: data.projectName,
-        contractAmount: 0,
+        contractAmount: data.contractAmount, // 修正這裡
         invoicedAmount: 0,
         paymentRound: 1,
         paymentPercent: 0,

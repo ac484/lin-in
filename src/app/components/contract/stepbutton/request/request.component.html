@@ -1,9 +1,14 @@
 <form (ngSubmit)="submit()" class="flex flex-col gap-4">
-  <label>申請金額
-    <input pInputText type="number" [(ngModel)]="amount" name="amount" required />
-  </label>
+  <div class="flex gap-4">
+    <label>申請金額
+      <input pInputText type="number" [(ngModel)]="amount" name="amount" required (ngModelChange)="onAmountChange($event)" />
+    </label>
+    <label>百分比
+      <input pInputText type="number" [(ngModel)]="percent" name="percent" required min="0" max="100" (ngModelChange)="onPercentChange($event)" />
+    </label>
+  </div>
   <label>備註
     <input pInputText [(ngModel)]="note" name="note" />
   </label>
-  <button pButton type="submit" label="送出" [disabled]="!amount"></button>
+  <button pButton type="submit" label="送出" [disabled]="!amount || !percent"></button>
 </form> 
