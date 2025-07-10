@@ -3,6 +3,7 @@ import { AuthService } from '../../../service/auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { globalMessageBus } from '../../services/global-message-bus';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -56,7 +57,10 @@ export class PassportComponent {
     this.error = '';
     this.success = '';
     this.auth.loginWithGoogle()
-      .then(() => this.router.navigate(['/basic']))
+      .then(() => {
+        globalMessageBus.next({ severity: 'success', summary: '登入成功', detail: 'Google 登入成功' });
+        this.router.navigate(['/contract']);
+      })
       .catch((e: Error) => this.error = e.message);
   }
 
@@ -64,7 +68,10 @@ export class PassportComponent {
     this.error = '';
     this.success = '';
     this.auth.loginWithEmail(this.email, this.password)
-      .then(() => this.router.navigate(['/basic']))
+      .then(() => {
+        globalMessageBus.next({ severity: 'success', summary: '登入成功', detail: 'Email 登入成功' });
+        this.router.navigate(['/contract']);
+      })
       .catch((e: Error) => this.error = e.message);
   }
 

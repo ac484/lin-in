@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { StatsWidget } from './dashboard/statswidget';
-import { SalesTrendWidget } from './dashboard/salestrendwidget';
-import { RecentActivityWidget } from './dashboard/recentactivitywidget';
-import { ProductOverviewWidget } from './dashboard/productoverviewwidget';
+import { StatsWidget } from './statswidget';
+import { SalesTrendWidget } from './salestrendwidget';
+import { RecentActivityWidget } from './recentactivitywidget';
+import { ProductOverviewWidget } from './productoverviewwidget';
 
 @Component({
   selector: 'app-dashboard',

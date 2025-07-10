@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
-import { DashboardComponent } from './components/dashboard.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AboutComponent } from './components/about.component';
 import { PassportComponent } from './shared/components/passport/passport.component';
 import { RegisterComponent } from './shared/components/register/register.component';
