@@ -48,7 +48,7 @@ export interface Contract {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, SplitterModule, PrimeNgModule, FormsModule, TimelineModule, StepButtonComponent, RequestComponent],
+  imports: [CommonModule, SplitterModule, PrimeNgModule, FormsModule, TimelineModule, StepButtonComponent],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
@@ -79,6 +79,9 @@ export class ContractComponent implements OnDestroy {
   draggingVertical = false;
   showStepper = false;
   showRequest: Contract | null = null;
+  paymentAmount: number | null = null;
+  paymentPercent: number | null = null;
+  paymentNote = '';
 
   constructor() {
     inject(AuthService).user$
@@ -207,6 +210,10 @@ export class ContractComponent implements OnDestroy {
     this.showRequest = contract;
   }
 
+  closeRequestDialog(): void {
+    this.showRequest = null;
+  }
+
   onSplitterResizeStart(): void {
     this.dragging = true;
   }
@@ -254,6 +261,57 @@ export class ContractComponent implements OnDestroy {
       transaction.set(doc(contractsCol), contract);
     });
     this.showStepper = false;
+  }
+
+  onPaymentAmountChange(val: number): void {
+    this.paymentAmount = val;
+    if (this.showRequest && this.showRequest.contractAmount) {
+      this.paymentPercent = this.showRequest.contractAmount > 0 ? Math.round((val / this.showRequest.contractAmount) * 100) : 0;
+    } else {
+      this.paymentPercent = 0;
+    }
+  }
+
+  onPaymentPercentChange(val: number): void {
+    this.paymentPercent = val;
+    if (this.showRequest && this.showRequest.contractAmount) {
+      this.paymentAmount = Math.round((val / 100) * this.showRequest.contractAmount);
+    } else {
+      this.paymentAmount = 0;
+    }
+  }
+
+  submitPayment(): void {
+    if (!this.showRequest || !this.paymentAmount || !this.paymentPercent) return;
+    const contract = this.showRequest;
+    const payments = Array.isArray(contract.payments) ? contract.payments : [];
+    const newRound = payments.length + 1;
+    let applicant = '未知';
+    const user = this.user;
+    if (user && typeof user === 'object' && 'displayName' in user) {
+      applicant = (user as any).displayName || '未知';
+    } else if (typeof user === 'string') {
+      applicant = user;
+    }
+    const record: PaymentRecord = {
+      round: newRound,
+      date: new Date().toISOString(),
+      amount: this.paymentAmount!,
+      percent: this.paymentPercent!,
+      applicant,
+      note: this.paymentNote,
+      status: '申請中'
+    };
+    payments.push(record);
+    // Firestore 寫入
+    if ((contract as any).id) {
+      const contractDoc = firestoreDoc(this.firestore, 'contracts', (contract as any).id);
+      updateDoc(contractDoc, { payments });
+    }
+    this.paymentAmount = null;
+    this.paymentPercent = null;
+    this.paymentNote = '';
+    this.showRequest = null;
   }
 
   ngOnDestroy() {

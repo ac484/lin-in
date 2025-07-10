@@ -168,10 +168,19 @@
       </div>
     </ng-template>
   </p-splitter>
-<p-dialog [visible]="showRequest !== null" [modal]="true" header="申請請款" [style]="{width: '400px'}" (onHide)="showRequest = null">
-  <app-request
-    *ngIf="showRequest"
-    [contract]="showRequest"
-    (paymentCreated)="showRequest = null">
-  </app-request>
+<p-dialog [visible]="showRequest !== null" [modal]="true" [closable]="true" header="申請請款" [style]="{width: '400px'}" (onHide)="closeRequestDialog()">
+  <form *ngIf="showRequest" (ngSubmit)="submitPayment()" class="flex flex-col gap-4">
+    <div class="flex gap-4">
+      <label>申請金額
+        <input pInputText type="number" [(ngModel)]="paymentAmount" name="paymentAmount" required (ngModelChange)="onPaymentAmountChange($event)" />
+      </label>
+      <label>百分比
+        <input pInputText type="number" [(ngModel)]="paymentPercent" name="paymentPercent" required min="0" max="100" (ngModelChange)="onPaymentPercentChange($event)" />
+      </label>
+    </div>
+    <label>備註
+      <input pInputText [(ngModel)]="paymentNote" name="paymentNote" />
+    </label>
+    <button pButton type="submit" label="送出" [disabled]="!paymentAmount || !paymentPercent"></button>
+  </form>
 </p-dialog>

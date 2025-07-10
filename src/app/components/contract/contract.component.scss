@@ -8,6 +8,16 @@
   height: 100%;
 }
 
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.gap-4 {
+  gap: 1rem;
+}
+
 :host ::ng-deep .p-datatable {
   .p-datatable-tbody > tr {
     transition: background-color 0.15s;
