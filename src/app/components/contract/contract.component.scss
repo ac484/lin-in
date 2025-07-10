@@ -9,17 +9,19 @@
 :host ::ng-deep .p-datatable {
   .p-datatable-tbody > tr {
     transition: background-color 0.15s;
-    &:hover { background-color: #f9fafb !important; }
-    &.p-highlight { background-color: #dbeafe !important; }
-    td { padding: 0.5rem !important; border-bottom: 1px solid #e5e7eb; }
+    &:hover { background-color: var(--surface-hover) !important; }
+    &.p-highlight { background-color: var(--primary-50, #dbeafe) !important; }
+    td { padding: 0.5rem !important; border-bottom: 1px solid var(--surface-border, #e5e7eb); }
   }
   .p-datatable-thead > tr > th {
-    background-color: #f3f4f6;
+    background-color: var(--surface-100, #f3f4f6);
     padding: 0.5rem !important;
     font-weight: 600;
-    border-bottom: 2px solid #d1d5db;
+    border-bottom: 2px solid var(--surface-border, #d1d5db);
+    color: var(--text-color, #222);
   }
 }
 .organization-chart-top {
   margin-bottom: 1.5rem;
 }
+// 進度條、按鈕等元件已自動跟隨 PrimeNG 主題
