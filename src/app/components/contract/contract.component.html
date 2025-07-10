@@ -169,37 +169,7 @@
       </ng-template>
       <!-- 下：備忘錄區 -->
       <ng-template #panel [stateKey]="'panel2-bottom'">
-        <div class="memo-panel flex flex-col h-full w-full p-2 gap-2">
-          <div class="flex-1 overflow-y-auto memo-list">
-            <ng-container *ngIf="loadingMessages">載入中...</ng-container>
-            <ng-container *ngIf="!loadingMessages && messages.length === 0">不想記又怕忘</ng-container>
-            <div *ngFor="let msg of messages" class="memo-item p-2 mb-2 rounded shadow-sm" style="background: var(--surface-0); color: var(--text-color);">
-              <div class="text-xs font-bold mb-1">
-                {{ msg.user }}
-                <span class="text-xs text-gray-400">
-                  {{ getMessageDate(msg) ? (getMessageDate(msg) | date:'yyyy/MM/dd HH:mm') : '' }}
-                </span>
-              </div>
-              <div>{{ msg.message }}</div>
-            </div>
-          </div>
-          <form class="flex gap-2 mt-2" (ngSubmit)="addMemo()">
-            <input pInputText [(ngModel)]="newMessage" name="newMemo" placeholder="輸入備忘內容..." class="flex-1" [disabled]="!selectedContract" />
-            <button
-              pButton
-              type="submit"
-              label="新增備忘"
-              icon="pi pi-bookmark"
-              [disabled]="
-                !newMessage.trim() ||
-                loadingMessages ||
-                !selectedContract ||
-                (getMemoCooldown() > 0 && memoTimestamps.length > 0 && (getNow() - memoTimestamps[memoTimestamps.length - 1] < getMemoCooldown()))
-              "
-            ></button>
-          </form>
-          <div *ngIf="memoError" class="text-xs text-red-600 mt-1">{{ memoError }}</div>
-        </div>
+        <app-messages [contract]="selectedContract" [user]="user"></app-messages>
       </ng-template>
     </p-splitter>
   </ng-template>

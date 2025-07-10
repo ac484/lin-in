@@ -19,6 +19,7 @@ import { TimelineModule } from 'primeng/timeline';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { StepButtonComponent } from './stepbutton/create/create.component';
 import { OrganizationChartModule } from 'primeng/organizationchart';
+import { MessagesComponent } from './stepbutton/messages/messages.component';
 import { collection as firestoreCollection, query, where, orderBy, onSnapshot, addDoc, deleteDoc, serverTimestamp, getDocs, Timestamp, QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { Injector, runInInjectionContext } from '@angular/core';
 
@@ -66,7 +67,7 @@ interface Message {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, StepButtonComponent, OrganizationChartModule],
+  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, StepButtonComponent, OrganizationChartModule, MessagesComponent],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
@@ -86,11 +87,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   paymentPercent: number | null = null;
   paymentNote = '';
   orgChartExpanded = true;
-  messages: Message[] = [];
-  newMessage = '';
-  loadingMessages = false;
-  memoTimestamps: number[] = [];
-  memoError = '';
+  // 備忘錄相關屬性移除
 
   // --------------------
   // Firestore/Storage/DI
@@ -182,91 +179,17 @@ export class ContractComponent implements OnInit, OnDestroy {
   // 生命週期
   // --------------------
   ngOnInit(): void {
-    this.listenMessages();
-    this.loadMemoTimestamps();
+    // 備忘錄相關移除
   }
   ngOnDestroy() {
-    if (this.messagesUnsub) this.messagesUnsub();
+    // 備忘錄相關移除
     this.destroyed$.next();
     this.destroyed$.complete();
   }
 
   // --------------------
-  // 本地儲存/備忘錄
+  // 本地儲存/備忘錄、Firestore 留言相關、getMemoCooldown、getMessageDate、getNow 全部移除
   // --------------------
-  loadMemoTimestamps(): void {
-    const raw = localStorage.getItem('contract_memo_timestamps');
-    this.memoTimestamps = raw ? JSON.parse(raw) : [];
-    this.cleanupMemoTimestamps();
-  }
-  saveMemoTimestamps(): void {
-    localStorage.setItem('contract_memo_timestamps', JSON.stringify(this.memoTimestamps));
-  }
-  cleanupMemoTimestamps(): void {
-    const now = Date.now();
-    this.memoTimestamps = this.memoTimestamps.filter(ts => now - ts < 30 * 24 * 60 * 60 * 1000);
-    this.saveMemoTimestamps();
-  }
-  getMemoCooldown(): number {
-    const now = Date.now();
-    this.cleanupMemoTimestamps();
-    const last5min = this.memoTimestamps.filter(ts => now - ts < 5 * 60 * 1000).length;
-    if (last5min >= 1) return 5 * 60 * 1000;
-    const last1hr = this.memoTimestamps.filter(ts => now - ts < 60 * 60 * 1000).length;
-    if (last1hr >= 10) return 10 * 60 * 1000;
-    const last24hr = this.memoTimestamps.filter(ts => now - ts < 24 * 60 * 60 * 1000).length;
-    if (last24hr >= 30) return 60 * 60 * 1000;
-    const last30d = this.memoTimestamps.length;
-    if (last30d >= 200) return 24 * 60 * 60 * 1000;
-    return 0;
-  }
-
-  // --------------------
-  // Firestore 留言相關
-  // --------------------
-  listenMessages(): void {
-    if (this.messagesUnsub) this.messagesUnsub();
-    if (!this.selectedContract) return;
-    this.loadingMessages = true;
-    const messagesCol = firestoreCollection(this.firestore, 'messages');
-    const q = query(messagesCol, where('contractId', '==', this.selectedContract.code), orderBy('createdAt', 'desc'));
-    runInInjectionContext(this.injector, () => {
-      this.messagesUnsub = onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
-        this.messages = snap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() } as Message));
-        this.loadingMessages = false;
-      });
-    });
-  }
-  async addMemo(): Promise<void> {
-    if (!this.newMessage.trim() || !this.selectedContract) return;
-    const now = Date.now();
-    const cooldown = this.getMemoCooldown();
-    const lastTs = this.memoTimestamps.length > 0 ? this.memoTimestamps[this.memoTimestamps.length - 1] : 0;
-    if (cooldown > 0 && now - lastTs < cooldown) {
-      this.memoError = `備忘錄新增過於頻繁，請稍候 ${(Math.ceil((cooldown - (now - lastTs))/1000))} 秒再試。`;
-      return;
-    }
-    this.memoError = '';
-    const messagesCol = firestoreCollection(this.firestore, 'messages');
-    await addDoc(messagesCol, {
-      contractId: this.selectedContract.code,
-      user: this.user?.displayName || '匿名',
-      message: this.newMessage.trim(),
-      createdAt: serverTimestamp(),
-      expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
-    });
-    this.memoTimestamps.push(now);
-    this.saveMemoTimestamps();
-    this.newMessage = '';
-  }
-  async removeExpiredMessages(): Promise<void> {
-    const messagesCol = firestoreCollection(this.firestore, 'messages');
-    const q = query(messagesCol, where('expireAt', '<=', new Date()));
-    const snap = await getDocs(q);
-    for (const doc of snap.docs) {
-      await deleteDoc(doc.ref);
-    }
-  }
 
   // --------------------
   // UI 事件/操作
@@ -278,13 +201,13 @@ export class ContractComponent implements OnInit, OnDestroy {
     if (event.data) {
       this.selectedContract = event.data as Contract;
       this.updateSafeUrl();
-      this.listenMessages();
+      // 備忘錄相關移除
     }
   }
   selectContract(contract: Contract): void {
     this.selectedContract = contract;
     this.updateSafeUrl();
-    this.listenMessages();
+    // 備忘錄相關移除
   }
   updateSafeUrl(): void {
     if (this.selectedContract && this.selectedContract.url && this.isPdfUrl(this.selectedContract.url)) {
@@ -488,14 +411,7 @@ export class ContractComponent implements OnInit, OnDestroy {
       date: p.date || ''
     }));
   }
-  getMessageDate(msg: Message): Date | null {
-    if (!msg.createdAt) return null;
-    if (typeof (msg.createdAt as any).toDate === 'function') {
-      return (msg.createdAt as any).toDate();
-    }
-    if (msg.createdAt instanceof Date) return msg.createdAt;
-    return null;
-  }
+  // 備忘錄相關移除
   getNow(): number {
     return Date.now();
   }
