@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { AboutComponent } from './components/contract/stepbutton/about/about.component';
+import { AboutComponent } from './components/about/about.component';
 import { PassportComponent } from './shared/components/passport/passport.component';
 import { RegisterComponent } from './shared/components/register/register.component';
 import { ContractComponent } from './components/contract/contract.component';
