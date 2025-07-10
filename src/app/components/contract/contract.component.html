@@ -1,17 +1,21 @@
-<ng-container *ngIf="!loading">
-  <ng-container *ngIf="user">
-    <div class="card">
-      <p-splitter [style]="{ height: '300px' }" class="mb-8">
-        <ng-template pSplitterPanel [size]="30">
-          <div class="flex items-center justify-center h-full">Panel 1 (左 30%)</div>
-        </ng-template>
-        <ng-template pSplitterPanel [size]="60">
-          <div class="flex items-center justify-center h-full">Panel 2 (中 60%)</div>
-        </ng-template>
-        <ng-template pSplitterPanel [size]="10">
-          <div class="flex items-center justify-center h-full">Panel 3 (右 10%)</div>
-        </ng-template>
-      </p-splitter>
-    </div>
-  </ng-container>
-</ng-container>
+<!-- 測試時可先移除 ngIf，確保 Splitter 一定顯示 -->
+<p-splitter style="width: 100%; height: 100%;">
+    <ng-template pSplitterPanel [size]="30">
+      <div class="flex flex-col items-center justify-center h-full gap-2">
+        <div class="text-lg font-bold">Panel 1 (左 30%)</div>
+        <div>這是左側內容</div>
+      </div>
+    </ng-template>
+    <ng-template pSplitterPanel [size]="40">
+      <div class="flex flex-col items-center justify-center h-full gap-2">
+        <div class="text-lg font-bold">Panel 2 (中 40%)</div>
+        <div>這是中間內容</div>
+      </div>
+    </ng-template>
+    <ng-template pSplitterPanel [size]="30">
+      <div class="flex flex-col items-center justify-center h-full gap-2">
+        <div class="text-lg font-bold">Panel 3 (右 30%)</div>
+        <div>這是右側內容</div>
+      </div>
+    </ng-template>
+  </p-splitter>

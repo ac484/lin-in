@@ -5,15 +5,7 @@ import { RouterModule } from '@angular/router';
 import { PrimeNgModule } from './shared/modules/prime-ng.module';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { Subject } from 'rxjs';
-
-export interface GlobalMessage {
-  severity: 'success' | 'info' | 'warn' | 'error';
-  summary: string;
-  detail: string;
-}
-
-export const globalMessageBus = new Subject<GlobalMessage>();
+import { globalMessageBus, GlobalMessage } from './shared/services/global-message-bus';
 
 @Component({
   selector: 'app-root',

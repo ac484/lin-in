@@ -2,14 +2,15 @@ import { Component, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SplitterModule } from 'primeng/splitter';
 import { AuthService } from '../../service/auth/auth.service';
-import { globalMessageBus } from '../../app.component';
+import { globalMessageBus } from '../../shared/services/global-message-bus';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { PrimeNgModule } from '../../shared/modules/prime-ng.module';
 
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, SplitterModule],
+  imports: [CommonModule, SplitterModule, PrimeNgModule],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
