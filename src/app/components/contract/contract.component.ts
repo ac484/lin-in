@@ -1,7 +1,8 @@
 // 本檔案依據 Firebase Console 專案設定，使用 Firebase Client SDK 操作 Cloud Firestore。
 import { Component, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SplitterModule } from 'primeng/splitter';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { ToastModule } from 'primeng/toast';
 import { AuthService } from '../../service/auth/auth.service';
 import { globalMessageBus } from '../../shared/services/global-message-bus';
 import { Subject, Observable } from 'rxjs';
@@ -47,7 +48,7 @@ export interface Contract {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, SplitterModule, PrimeNgModule, FormsModule, TimelineModule, StepButtonComponent],
+  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, StepButtonComponent],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
