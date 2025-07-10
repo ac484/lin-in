@@ -15,7 +15,6 @@ import { FormsModule } from '@angular/forms';
 import { Firestore, collection, doc, runTransaction, collectionData, DocumentData, doc as firestoreDoc, updateDoc } from '@angular/fire/firestore';
 import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage';
 import { PdfA4Pipe } from '../../shared/pipes/pdf-a4.pipe';
-import { TimelineModule } from 'primeng/timeline';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { StepButtonComponent } from './stepbutton/create/create.component';
 import { OrganizationChartModule } from 'primeng/organizationchart';
