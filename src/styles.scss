@@ -1,5 +1,2 @@
-mat-toolbar, mat-card, aside, nav, mat-nav-list {
-  box-shadow: none !important;
-  border: none !important;
-  border-radius: 0 !important;
-}
+@use './tailwind.css';
+@use "primeicons/primeicons.css";

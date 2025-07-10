@@ -1,5 +1,5 @@
 {
-  "name": "my-angular-app",
+  "name": "primeng-quickstart",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -8,49 +8,39 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
-  "prettier": {
-    "overrides": [
-      {
-        "files": "*.html",
-        "options": {
-          "parser": "angular"
-        }
-      }
-    ]
-  },
   "private": true,
   "dependencies": {
-    "@angular/cdk": "20.1.0",
-    "@angular/common": "^20.0.0",
-    "@angular/compiler": "^20.0.0",
-    "@angular/core": "^20.0.0",
-    "@angular/fire": "20.0.1",
-    "@angular/forms": "^20.0.0",
-    "@angular/material": "20.1.0",
-    "@angular/platform-browser": "^20.0.0",
-    "@angular/router": "^20.0.0",
-    "@delon/abc": "^20.0.0",
-    "@delon/acl": "^20.0.0",
-    "@delon/form": "^20.0.0",
-    "@delon/theme": "^20.0.0",
-    "@delon/util": "^20.0.0",
-    "ng-zorro-antd": "^20.0.0",
-    "primeng": "20.0.0-rc.3",
+    "@angular/common": "^20",
+    "@angular/compiler": "^20",
+    "@angular/core": "^20",
+    "@angular/fire": "^20.0.1",
+    "@angular/forms": "^20",
+    "@angular/platform-browser": "^20",
+    "@angular/platform-browser-dynamic": "^20",
+    "@angular/router": "^20",
+    "@primeuix/themes": "^1.2.0",
+    "@tailwindcss/postcss": "^4.1.4",
+    "chart.js": "^4.4.8",
+    "postcss": "^8.5.3",
+    "primeicons": "^7.0.0",
+    "primeng": "^20.0.0-rc.2",
     "rxjs": "~7.8.0",
+    "tailwindcss": "^4.1.4",
+    "tailwindcss-primeui": "^0.6.1",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "^20.0.5",
-    "@angular/cli": "^20.0.5",
-    "@angular/compiler-cli": "^20.0.0",
+    "@angular-devkit/build-angular": "^20",
+    "@angular/cli": "^20",
+    "@angular/compiler-cli": "^20",
     "@types/jasmine": "~5.1.0",
-    "jasmine-core": "~5.7.0",
+    "jasmine-core": "~5.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.8.2"
+    "typescript": "~5.8.3"
   }
 }
