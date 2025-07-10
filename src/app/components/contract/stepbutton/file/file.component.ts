@@ -1,6 +1,5 @@
 // 本檔案依據 Firebase Console 專案設定，使用 Firebase Client SDK 操作 Cloud Firestore。
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Contract } from '../../contract.component';
 import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage';
 import { Firestore, doc as firestoreDoc, updateDoc } from '@angular/fire/firestore';
@@ -9,16 +8,15 @@ import { PdfA4Pipe } from '../../../../shared/pipes/pdf-a4.pipe';
 @Component({
   selector: 'app-file',
   standalone: true,
-  imports: [CommonModule],
   templateUrl: './file.component.html',
   styleUrls: ['./file.component.scss']
 })
 export class FileComponent {
   @Input() contract!: Contract & { id?: string };
-  @Input() disabled = false;
+  @Input() uploadingContractCode: string | null = null;
+  @Output() uploading = new EventEmitter<string | null>();
   @Output() uploaded = new EventEmitter<string>();
 
-  uploading = false;
   private storage = inject(Storage);
   private firestore = inject(Firestore);
   private pdfA4Pipe = new PdfA4Pipe();
@@ -30,7 +28,7 @@ export class FileComponent {
     if (file.type === 'application/pdf') {
       file = new File([await this.pdfA4Pipe.transform(file)], file.name, { type: 'application/pdf' });
     }
-    this.uploading = true;
+    this.uploading.emit(this.contract.code);
     try {
       const filePath = `contracts/${this.contract.code}_${Date.now()}_${file.name}`;
       const storageRef = ref(this.storage, filePath);
@@ -43,7 +41,7 @@ export class FileComponent {
       this.contract.url = url;
       this.uploaded.emit(url);
     } finally {
-      this.uploading = false;
+      this.uploading.emit(null);
       input.value = '';
     }
   }

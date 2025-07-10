@@ -19,6 +19,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { StepButtonComponent } from './stepbutton/create/create.component';
 import { OrganizationChartModule } from 'primeng/organizationchart';
 import { MessagesComponent } from './stepbutton/messages/messages.component';
+import { FileComponent } from './stepbutton/file/file.component';
 import { collection as firestoreCollection, query, where, orderBy, onSnapshot, addDoc, deleteDoc, serverTimestamp, getDocs, Timestamp, QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { Injector, runInInjectionContext } from '@angular/core';
 
@@ -66,7 +67,7 @@ interface Message {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, StepButtonComponent, OrganizationChartModule, MessagesComponent],
+  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, StepButtonComponent, OrganizationChartModule, MessagesComponent, FileComponent],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
@@ -215,60 +216,12 @@ export class ContractComponent implements OnInit, OnDestroy {
       this.safeUrl = null;
     }
   }
-  async addContract(): Promise<void> {
-    const serialDoc = doc(this.firestore, 'meta/contract_serial');
-    const contractsCol = collection(this.firestore, 'contracts');
-    await runTransaction(this.firestore, async (transaction) => {
-      const serialSnap = await transaction.get(serialDoc);
-      let current = 1;
-      if (serialSnap.exists()) {
-        const data = serialSnap.data() as { current: number };
-        current = data.current + 1;
-      }
-      transaction.set(serialDoc, { current }, { merge: true });
-      const code = `C-${current.toString().padStart(3, '0')}`;
-      const contract: Contract = {
-        status: '新建',
-        code,
-        orderNo: '',
-        orderDate: '',
-        projectNo: '',
-        projectName: '',
-        contractAmount: 0,
-        invoicedAmount: 0,
-        paymentRound: 1,
-        paymentPercent: 0,
-        paymentStatus: '未請款',
-        invoiceStatus: '未開立',
-        pendingPercent: 100,
-        note: '',
-        url: ''
-      };
-      transaction.set(doc(contractsCol), contract);
-    });
+  // 移除 onContractFileSelected
+  onUploading(code: string | null): void {
+    this.uploadingContractCode = code;
   }
-  async onContractFileSelected(event: Event, contract: Contract & { id?: string }): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
-    let file = input.files[0];
-    if (file.type === 'application/pdf') {
-      file = new File([await this.pdfA4Pipe.transform(file)], file.name, { type: 'application/pdf' });
-    }
-    this.uploadingContractCode = contract.code;
-    try {
-      const filePath = `contracts/${contract.code}_${Date.now()}_${file.name}`;
-      const storageRef = ref(this.storage, filePath);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      if (contract.id) {
-        const contractDoc = firestoreDoc(this.firestore, 'contracts', contract.id);
-        await updateDoc(contractDoc, { url });
-      }
-      contract.url = url;
-    } finally {
-      this.uploadingContractCode = null;
-      input.value = '';
-    }
+  onUploaded(url: string): void {
+    // 可根據需要顯示提示或刷新資料，這裡保持極簡不做多餘處理
   }
   toggleExpand(contract: Contract, event: Event): void {
     event.stopPropagation();

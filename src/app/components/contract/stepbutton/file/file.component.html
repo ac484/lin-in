@@ -3,7 +3,7 @@
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
       d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
   </svg>
-  <input type="file" class="hidden" accept="application/pdf,image/*" (change)="onFileSelected($event)" [disabled]="!!contract.url || uploading || disabled" />
+  <input type="file" class="hidden" accept="application/pdf,image/*" (change)="onFileSelected($event)" [disabled]="!!contract.url || uploadingContractCode === contract.code" />
 </label>
-<span *ngIf="uploading" class="text-xs text-gray-500 ml-2">上傳中...</span>
+<span *ngIf="uploadingContractCode === contract.code" class="text-xs text-gray-500 ml-2">上傳中...</span>
 <a *ngIf="contract.url" [href]="contract.url" target="_blank" class="ml-2 text-blue-600 underline">檢視</a>
