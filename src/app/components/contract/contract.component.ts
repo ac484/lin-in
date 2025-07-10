@@ -9,6 +9,7 @@ import { takeUntil } from 'rxjs/operators';
 import { PrimeNgModule } from '../../shared/modules/prime-ng.module';
 import { FormsModule } from '@angular/forms';
 import { Firestore, collection, addDoc, doc, runTransaction, collectionData, DocumentData } from '@angular/fire/firestore';
+import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage';
 
 export interface Contract {
   status: string;
@@ -40,6 +41,7 @@ export class ContractComponent implements OnDestroy {
   private destroyed$ = new Subject<void>();
   private toastShown = false;
   private firestore = inject(Firestore);
+  private storage = inject(Storage);
   firestoreContracts$: Observable<Contract[] | null>;
   _contracts: Contract[] | null = null;
   get contracts(): Contract[] {

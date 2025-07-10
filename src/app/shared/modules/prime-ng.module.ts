@@ -37,6 +37,9 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 // PrimeNG 檔案上傳模組
 import { FileUploadModule } from 'primeng/fileupload';
+// PrimeNG 檔案上傳模組
+import { FileUpload } from 'primeng/fileupload';
+
 // PrimeNG 動態對話框服務
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 // PrimeNG 分割按鈕模組
@@ -93,6 +96,7 @@ import { DatePickerModule } from 'primeng/datepicker';
     ConfirmDialogModule,
     TooltipModule,
     FileUploadModule,
+    FileUpload,
     SplitButtonModule,
     DataViewModule,
     TreeModule,
@@ -131,6 +135,7 @@ import { DatePickerModule } from 'primeng/datepicker';
     ConfirmDialogModule,
     TooltipModule,
     FileUploadModule,
+    FileUpload,
     SplitButtonModule,
     DataViewModule,
     TreeModule,
