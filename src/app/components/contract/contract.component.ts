@@ -44,6 +44,7 @@ export interface Contract {
   note: string;
   url: string; // 檔案下載連結
   payments?: PaymentRecord[];
+  members?: { name: string; role: string }[];
 }
 
 @Component({
@@ -79,16 +80,21 @@ export class ContractComponent implements OnDestroy {
   readonly statusList: PaymentRecord['status'][] = ['初始','申請中','審核中','開票中','放款中','完成'];
   // 產生組織圖資料，未來可根據 contract 內容動態產生
   getOrgChartData(contract: Contract): any {
-    // 範例：根據 contract.projectName 動態顯示
     return {
       label: contract.projectName || '專案團隊',
       expanded: true,
-      children: [
-        { label: '負責人', type: 'person', data: { name: '王小明', role: '負責人' } },
-        { label: '會計', type: 'person', data: { name: '李會計', role: '會計' } },
-        { label: '專案經理', type: 'person', data: { name: '張經理', role: '專案經理' } },
-        { label: '成員A', type: 'person', data: { name: '陳成員', role: '工程師' } }
-      ]
+      children: (contract.members && contract.members.length > 0
+        ? contract.members
+        : [
+            { name: '', role: '' },
+            { name: '', role: '' },
+            { name: '', role: '' }
+          ]
+      ).map(m => ({
+        label: m.role || '角色',
+        type: 'person',
+        data: m
+      }))
     };
   }
 
@@ -238,7 +244,7 @@ export class ContractComponent implements OnDestroy {
   onVerticalSplitterResizeStart(): void { this.dragging = true; }
   onVerticalSplitterResizeEnd(): void { this.dragging = false; }
 
-  onStepperCreated(data: { orderNo: string; projectNo: string; projectName: string; url: string; contractAmount: number }): void {
+  onStepperCreated(data: { orderNo: string; projectNo: string; projectName: string; url: string; contractAmount: number; members: { name: string; role: string }[] }): void {
     // 建立合約
     const serialDoc = doc(this.firestore, 'meta/contract_serial');
     const contractsCol = collection(this.firestore, 'contracts');
@@ -266,7 +272,8 @@ export class ContractComponent implements OnDestroy {
         invoiceStatus: '未開立',
         pendingPercent: 100,
         note: '',
-        url: data.url
+        url: data.url,
+        members: data.members
       };
       transaction.set(doc(contractsCol), contract);
     });

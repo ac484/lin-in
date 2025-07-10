@@ -13,6 +13,15 @@
                     <label>工程名稱
                         <input pInputText [(ngModel)]="projectName" required />
                     </label>
+                    <div class="mt-4">
+                        <div class="font-bold mb-2">專案成員</div>
+                        <div *ngFor="let m of members; let i = index" class="flex gap-2 mb-2">
+                            <input pInputText [(ngModel)]="m.name" placeholder="姓名" style="width: 100px;" />
+                            <input pInputText [(ngModel)]="m.role" placeholder="角色" style="width: 100px;" />
+                            <button pButton type="button" icon="pi pi-trash" class="p-button-text p-0" (click)="members.length > 1 && members.splice(i,1)" [disabled]="members.length <= 1"></button>
+                        </div>
+                        <button pButton type="button" label="新增成員" class="p-button-sm" (click)="members.push({name: '', role: ''})"></button>
+                    </div>
                 </div>
                 <div class="py-6">
                     <p-button label="Next" (onClick)="activateCallback(2)" [disabled]="!orderNo || !projectNo || !projectName" />

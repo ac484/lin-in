@@ -11,7 +11,14 @@
   <ng-template #panel>
     <div class="flex flex-col items-center justify-start h-full gap-2">
       <div class="w-full organization-chart-top">
-        <p-organizationChart [value]="[selectedContract ? getOrgChartData(selectedContract) : getDefaultOrgChartData()]" styleClass="w-full"></p-organizationChart>
+        <p-organizationChart [value]="[selectedContract ? getOrgChartData(selectedContract) : getDefaultOrgChartData()]" styleClass="w-full" [collapsible]="true">
+          <ng-template let-node pTemplate="person">
+            <div class="flex flex-col items-center">
+              <span class="font-bold mb-1">{{ node.data.name || '—' }}</span>
+              <span class="text-xs text-gray-500">{{ node.data.role || '—' }}</span>
+            </div>
+          </ng-template>
+        </p-organizationChart>
       </div>
       <p-table [value]="contracts" styleClass="p-datatable-sm w-full" [tableStyle]="{ 'font-size': '13px' }" [responsiveLayout]="'scroll'"
         selectionMode="single" [(selection)]="selectedContract" dataKey="code" [rowHover]="true"
