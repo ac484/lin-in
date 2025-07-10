@@ -26,7 +26,7 @@ interface User {
           <mat-icon>account_circle</mat-icon>
         </ng-template>
       </button>
-      <mat-menu #menu="matMenu">
+      <mat-menu #menu="matMenu" yPosition="above" overlapTrigger="false">
         <div style="padding:8px 16px;min-width:160px;">
           <div style="font-weight:bold;">{{ user?.displayName || user?.email }}</div>
         </div>
