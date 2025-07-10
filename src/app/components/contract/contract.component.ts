@@ -12,6 +12,7 @@ import { Firestore, collection, addDoc, doc, runTransaction, collectionData, Doc
 import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage';
 import { PdfA4Pipe } from '../../shared/pipes/pdf-a4.pipe';
 import { TimelineModule } from 'primeng/timeline';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 export interface Contract {
   status: string;
@@ -58,7 +59,9 @@ export class ContractComponent implements OnDestroy {
   }
   uploadingContractCode: string | null = null;
   selectedContract: Contract | null = null;
+  safeUrl: SafeResourceUrl | null = null;
   private pdfA4Pipe = new PdfA4Pipe();
+  private sanitizer = inject(DomSanitizer);
 
   constructor() {
     inject(AuthService).user$
@@ -87,6 +90,29 @@ export class ContractComponent implements OnDestroy {
   isPdfUrl(url: string): boolean {
     // 檢查URL是否包含.pdf，不管是否有查詢參數
     return url.includes('.pdf');
+  }
+
+  onRowSelect(event: any): void {
+    console.log('Row selected:', event);
+    if (event.data) {
+      this.selectedContract = event.data as Contract;
+      console.log('Selected contract:', this.selectedContract.code);
+      this.updateSafeUrl();
+    }
+  }
+
+  selectContract(contract: Contract): void {
+    this.selectedContract = contract;
+    this.updateSafeUrl();
+    console.log('Manually selected contract:', contract.code);
+  }
+
+  updateSafeUrl(): void {
+    if (this.selectedContract && this.selectedContract.url && this.isPdfUrl(this.selectedContract.url)) {
+      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedContract.url);
+    } else {
+      this.safeUrl = null;
+    }
   }
 
   async addContract(): Promise<void> {

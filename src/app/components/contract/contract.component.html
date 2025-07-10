@@ -5,7 +5,8 @@
               <!-- Panel 1 內容 -->
       <div class="flex flex-col items-center justify-center h-full gap-2">
         <p-table [value]="contracts" styleClass="p-datatable-sm w-full" [tableStyle]="{ 'font-size': '13px' }" [responsiveLayout]="'scroll'"
-          selectionMode="single" [(selection)]="selectedContract" dataKey="code">
+          selectionMode="single" [(selection)]="selectedContract" dataKey="code" [rowHover]="true"
+          (onRowSelect)="onRowSelect($event)">
           <ng-template pTemplate="header">
             <tr>
               <th>編號</th>
@@ -21,7 +22,10 @@
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-contract let-rowIndex="rowIndex">
-            <tr>
+            <tr [pSelectableRow]="contract" [pSelectableRowIndex]="rowIndex" 
+                class="cursor-pointer hover:bg-gray-50 transition-colors"
+                [class.bg-blue-50]="selectedContract?.code === contract.code"
+                (click)="selectContract(contract)">
               <td>{{ contract.code }}</td>
               <td>{{ contract.status }}</td>
               <td>{{ contract.orderNo }}</td>
@@ -31,7 +35,7 @@
               <td>{{ contract.invoicedAmount }}</td>
               <td>{{ contract.paymentPercent }}%</td>
               <td>{{ contract.pendingPercent }}%</td>
-              <td>
+              <td (click)="$event.stopPropagation()">
                 <label class="cursor-pointer">
                   <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -66,23 +70,17 @@
     <ng-template #panel [stateKey]="'panel2'">
       <p-splitter layout="vertical" [panelSizes]="[70, 30]">
         <ng-template #panel [stateKey]="'panel2-top'">
-                  <!-- 上半部內容 -->
           <div class="flex flex-col items-center justify-center h-full w-full">
-            <ng-container *ngIf="selectedContract && selectedContract.url && isPdfUrl(selectedContract.url); else noPdf">
-              <iframe
-                [attr.src]="selectedContract.url"
-                width="100%"
-                height="500"
-                style="border: none;"
-              ></iframe>
-            </ng-container>
-            <ng-template #noPdf>
-              <div class="text-gray-500">
-                <div *ngIf="!selectedContract">請選擇合約</div>
-                <div *ngIf="selectedContract && !selectedContract.url">請上傳PDF檔案</div>
-                <div *ngIf="selectedContract && selectedContract.url && !isPdfUrl(selectedContract.url)">請上傳PDF格式檔案</div>
-              </div>
-            </ng-template>
+            <iframe
+              *ngIf="safeUrl"
+              [src]="safeUrl"
+              width="100%"
+              height="500"
+              style="border: none;"
+            ></iframe>
+            <div *ngIf="!safeUrl" class="text-gray-500">
+              請選擇有 PDF 檔案的合約
+            </div>
           </div>
         </ng-template>
         <ng-template #panel [stateKey]="'panel2-bottom'">
