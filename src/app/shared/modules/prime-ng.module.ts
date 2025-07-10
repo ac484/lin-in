@@ -39,7 +39,6 @@ import { TooltipModule } from 'primeng/tooltip';
 import { FileUploadModule } from 'primeng/fileupload';
 // PrimeNG 檔案上傳模組
 import { FileUpload } from 'primeng/fileupload';
-
 // PrimeNG 動態對話框服務
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 // PrimeNG 分割按鈕模組
@@ -70,6 +69,8 @@ import { ContextMenuModule } from 'primeng/contextmenu';
 import { DragDropModule } from 'primeng/dragdrop';
 // PrimeNG 多值標籤模組
 // import { ChipsModule } from 'primeng/chips'; // 若未安裝可先註解
+import { StepperModule } from 'primeng/stepper';
+// PrimeNG 捲軸模組
 import { ScrollerModule } from 'primeng/scroller';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -113,6 +114,10 @@ import { DatePickerModule } from 'primeng/datepicker';
     ScrollerModule,
     SelectModule,
     DatePickerModule,
+    StepperModule,
+    ScrollerModule,
+    SelectModule,
+    DatePickerModule,
   ],
   exports: [
     CommonModule,
@@ -149,6 +154,10 @@ import { DatePickerModule } from 'primeng/datepicker';
     BadgeModule,
     ContextMenuModule,
     DragDropModule,
+    ScrollerModule,
+    SelectModule,
+    DatePickerModule,
+    StepperModule,
     ScrollerModule,
     SelectModule,
     DatePickerModule,
