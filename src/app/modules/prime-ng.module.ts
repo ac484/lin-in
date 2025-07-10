@@ -18,18 +18,12 @@ import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 // PrimeNG 表格模組
 import { TableModule } from 'primeng/table';
-// PrimeNG 下拉選單模組
-import { DropdownModule } from 'primeng/dropdown';
 // PrimeNG 核取方塊模組
 import { CheckboxModule } from 'primeng/checkbox';
 // PrimeNG 單選按鈕模組
 import { RadioButtonModule } from 'primeng/radiobutton';
 // PrimeNG 數字輸入模組
 import { InputNumberModule } from 'primeng/inputnumber';
-// PrimeNG 行事曆模組
-import { CalendarModule } from 'primeng/calendar';
-// PrimeNG 側邊欄模組
-import { SidebarModule } from 'primeng/sidebar';
 // PrimeNG 面板模組
 import { PanelModule } from 'primeng/panel';
 // PrimeNG 手風琴模組
@@ -43,7 +37,7 @@ import { TooltipModule } from 'primeng/tooltip';
 // PrimeNG 檔案上傳模組
 import { FileUploadModule } from 'primeng/fileupload';
 // PrimeNG 動態對話框服務
-import { DialogService, DynamicDialog } from 'primeng/dynamicdialog';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 // PrimeNG 分割按鈕模組
 import { SplitButtonModule } from 'primeng/splitbutton';
 // PrimeNG 資料檢視模組
@@ -86,19 +80,17 @@ export const PrimeNgModules = [
   ToastModule, // 提示訊息
   DialogModule, // 對話框
   TableModule, // 表格
-  DropdownModule, // 下拉選單
   CheckboxModule, // 核取方塊
   RadioButtonModule, // 單選按鈕
   InputNumberModule, // 數字輸入
-  CalendarModule, // 行事曆
-  SidebarModule, // 側邊欄
+
   PanelModule, // 面板
   AccordionModule, // 手風琴
   ProgressSpinnerModule, // 輪播進度
   ConfirmDialogModule, // 確認對話框
   TooltipModule, // 工具提示
   FileUploadModule, // 檔案上傳
-  DynamicDialog, // 動態對話框
+  DynamicDialogRef, // 動態對話框
   SplitButtonModule, // 分割按鈕
   DataViewModule, // 資料檢視
   TreeModule, // 樹狀結構
@@ -113,6 +105,7 @@ export const PrimeNgModules = [
   ContextMenuModule, // Tree 右鍵選單
   DragDropModule, // Tree 拖曳
   ScrollerModule, // 虛擬捲動
+  DialogService, // 動態對話框服務
   // ChipsModule // 多值標籤（如未安裝請勿加入）
   // 其他 PrimeNG 模組請加在此處
 ];

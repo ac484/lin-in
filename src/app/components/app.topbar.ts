@@ -4,15 +4,25 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfig } from './app.config';
 import { LayoutService } from '../service/layout.service';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../service/auth/auth.service';
+import { DialogModule } from 'primeng/dialog';
+import { FormsModule } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [CommonModule, ButtonModule, StyleClassModule, AppConfig],
+  imports: [
+    CommonModule,
+    ButtonModule,
+    StyleClassModule,
+    AppConfig,
+    DialogModule,
+    FormsModule,
+    InputTextModule
+  ],
   template: `
-    <div
-      class="bg-surface-0 dark:bg-surface-900 p-6 rounded-2xl max-w-7xl mx-auto border border-surface-200 dark:border-surface-700 w-full"
-    >
+    <div class="bg-surface-0 dark:bg-surface-900 p-6 rounded-2xl max-w-7xl mx-auto border border-surface-200 dark:border-surface-700 w-full">
       <div class="flex justify-between items-center">
         <div class="flex gap-3 items-center">
           <svg
@@ -155,20 +165,106 @@ import { CommonModule } from '@angular/common';
             />
             <app-config class="hidden" />
           </div>
+          <button
+            *ngIf="!(auth.user$ | async)"
+            pButton
+            type="button"
+            label="登入"
+            class="ml-2"
+            (click)="showLogin = true"
+          ></button>
+          <button
+            *ngIf="auth.user$ | async"
+            pButton
+            type="button"
+            label="登出"
+            class="ml-2"
+            (click)="logout()"
+          ></button>
         </div>
       </div>
     </div>
-  `,
+    <p-dialog [(visible)]="showLogin" [modal]="true" [closable]="true" [header]="isRegister ? '註冊' : '登入'" [style]="{width: '350px'}">
+      <form (ngSubmit)="isRegister ? registerWithEmail() : loginWithEmail()" #f="ngForm">
+        <div class="mb-3">
+          <input pInputText [(ngModel)]="email" name="email" required type="email" placeholder="Email" class="w-full" />
+        </div>
+        <div class="mb-3">
+          <input pInputText [(ngModel)]="password" name="password" required type="password" placeholder="Password" class="w-full" />
+        </div>
+        <button pButton type="submit" [label]="isRegister ? '註冊' : '登入'" class="w-full mb-2" [severity]="'primary'"></button>
+      </form>
+      <button *ngIf="!isRegister" pButton type="button" label="Google 登入" class="w-full mb-2" [severity]="'secondary'" (click)="loginWithGoogle()"></button>
+      <button pButton type="button" class="w-full p-button-text" [label]="isRegister ? '已有帳號？登入' : '沒有帳號？註冊'" (click)="toggleMode()"></button>
+      <div *ngIf="error" style="color:red;margin-top:8px;">{{error}}</div>
+      <div *ngIf="success" style="color:green;margin-top:8px;">{{success}}</div>
+    </p-dialog>
+  `
 })
 export class AppTopbar {
   layoutService: LayoutService = inject(LayoutService);
-
   isDarkMode = computed(() => this.layoutService.appState().darkMode);
+
+  showLogin = false;
+  isRegister = false;
+  email = '';
+  password = '';
+  error = '';
+  success = '';
+
+  constructor(public auth: AuthService) {}
 
   toggleDarkMode() {
     this.layoutService.appState.update((state) => ({
       ...state,
       darkMode: !state.darkMode,
     }));
+  }
+
+  toggleMode() {
+    this.isRegister = !this.isRegister;
+    this.error = '';
+    this.success = '';
+  }
+
+  loginWithEmail() {
+    this.error = '';
+    this.success = '';
+    this.auth.loginWithEmail(this.email, this.password)
+      .then(() => {
+        this.showLogin = false;
+        this.email = '';
+        this.password = '';
+      })
+      .catch((e: Error) => this.error = e.message);
+  }
+
+  registerWithEmail() {
+    this.error = '';
+    this.success = '';
+    this.auth.registerWithEmail(this.email, this.password)
+      .then(() => {
+        this.success = '註冊成功，請登入！';
+        this.isRegister = false;
+        this.email = '';
+        this.password = '';
+      })
+      .catch((e: Error) => this.error = e.message);
+  }
+
+  loginWithGoogle() {
+    this.error = '';
+    this.success = '';
+    this.auth.loginWithGoogle()
+      .then(() => {
+        this.showLogin = false;
+        this.email = '';
+        this.password = '';
+      })
+      .catch((e: Error) => this.error = e.message);
+  }
+
+  logout() {
+    this.auth.logout();
   }
 }
