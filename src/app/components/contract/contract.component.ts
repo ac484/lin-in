@@ -178,6 +178,11 @@ export class ContractComponent implements OnDestroy {
     }
   }
 
+  toggleExpand(contract: Contract, event: Event): void {
+    event.stopPropagation();
+    (contract as any).expanded = !(contract as any).expanded;
+  }
+
   onSplitterResizeStart(): void {
     this.dragging = true;
   }

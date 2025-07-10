@@ -24,6 +24,7 @@
               <th>已請款金額</th>
               <th>請款%</th>
               <th>尚未請款%</th>
+              <th>檔案</th>
               <th>操作</th>
             </tr>
           </ng-template>
@@ -41,6 +42,7 @@
               <td>{{ contract.invoicedAmount }}</td>
               <td>{{ contract.paymentPercent }}%</td>
               <td>{{ contract.pendingPercent }}%</td>
+              <!-- 檔案欄 -->
               <td (click)="$event.stopPropagation()">
                 <label class="cursor-pointer">
                   <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -52,9 +54,16 @@
                 <span *ngIf="uploadingContractCode === contract.code" class="text-xs text-gray-500 ml-2">上傳中...</span>
                 <a *ngIf="contract.url" [href]="contract.url" target="_blank" class="ml-2 text-blue-600 underline">檢視</a>
               </td>
+              <!-- 操作欄 -->
+              <td (click)="$event.stopPropagation()">
+                <button pButton type="button" icon="pi pi-info-circle" class="p-button-text p-0"
+                  (click)="toggleExpand(contract, $event)">
+                  詳細
+                </button>
+              </td>
             </tr>
             <tr *ngIf="contract.expanded">
-              <td colspan="10">
+              <td colspan="11">
                 <div class="flex flex-wrap gap-2 items-center">
                   <span>請款狀態: {{ contract.paymentStatus }}</span>
                   <span>發票狀態: {{ contract.invoiceStatus }}</span>
@@ -78,18 +87,26 @@
         (onResizeStart)="onVerticalSplitterResizeStart()"
         (onResizeEnd)="onVerticalSplitterResizeEnd()">
         <ng-template #panel [stateKey]="'panel2-top'">
-          <div class="flex flex-col items-center justify-center h-full w-full" style="position: relative;">
+          <div class="flex flex-col items-center justify-center h-full w-full" 
+            style="position: relative; height: 100%;">
+            <!--
+              下方 object 標籤與外層 div 設定 height: 100%、width: 100%，
+              目的是讓 PDF 預覽區塊能與 Splitter 面板上下左右完全貼合，
+              避免出現多餘空白。
+              object 標籤：width="100%"（左右貼合），height="100%"（上下貼合），
+              style="border: none; display: block;"（移除預設邊框，確保無空隙）
+              遮罩 div 也需 height/width 100% 才能完全覆蓋 PDF 區塊。
+            -->
             <object
               *ngIf="safeUrl"
               [data]="safeUrl"
               type="application/pdf"
               width="100%"
-              height="500px"
-              style="border: none;"
+              height="100%"
+              style="border: none; display: block;"
             >
               <div>無法預覽 PDF，請<a [href]="safeUrl" target="_blank" class="text-blue-600 underline">下載檔案</a>。</div>
             </object>
-            <!-- 拖曳時顯示遮罩 -->
             <div
               *ngIf="dragging || draggingVertical"
               style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: transparent; cursor: move;"
