@@ -20,6 +20,7 @@ import { StepButtonComponent } from './stepbutton/create/create.component';
 import { MessagesComponent } from './stepbutton/messages/messages.component';
 import { FileComponent } from './stepbutton/file/file.component';
 import { OrganizationalComponent } from './stepbutton/organizational/organizational.component';
+import { RequestComponent } from './stepbutton/request/request.component';
 import { collection as firestoreCollection, query, where, orderBy, onSnapshot, addDoc, deleteDoc, serverTimestamp, getDocs, Timestamp, QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { Injector, runInInjectionContext } from '@angular/core';
 
@@ -67,7 +68,7 @@ interface Message {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, StepButtonComponent, MessagesComponent, FileComponent, OrganizationalComponent],
+  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, StepButtonComponent, MessagesComponent, FileComponent, OrganizationalComponent, RequestComponent],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
@@ -82,11 +83,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   safeUrl: SafeResourceUrl | null = null;
   dragging = false;
   showStepper = false;
-  showRequest: Contract | null = null;
-  paymentAmount: number | null = null;
-  paymentPercent: number | null = null;
-  paymentNote = '';
-  // 備忘錄相關屬性移除
+  // 請款相關屬性與方法已移除
 
   // --------------------
   // Firestore/Storage/DI
@@ -201,12 +198,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   editContract(contract: Contract, event: Event): void {
     event.stopPropagation();
   }
-  applyPayment(contract: Contract): void {
-    this.showRequest = contract;
-  }
-  closeRequestDialog(): void {
-    this.showRequest = null;
-  }
+  // 請款相關方法已移除
   onSplitterResizeStart(): void { this.dragging = true; }
   onSplitterResizeEnd(): void { this.dragging = false; }
   onVerticalSplitterResizeStart(): void { this.dragging = true; }
@@ -245,53 +237,7 @@ export class ContractComponent implements OnInit, OnDestroy {
     });
     this.showStepper = false;
   }
-  onPaymentAmountChange(val: number): void {
-    this.paymentAmount = val;
-    if (this.showRequest && this.showRequest.contractAmount) {
-      this.paymentPercent = this.showRequest.contractAmount > 0 ? Math.round((val / this.showRequest.contractAmount) * 100) : 0;
-    } else {
-      this.paymentPercent = 0;
-    }
-  }
-  onPaymentPercentChange(val: number): void {
-    this.paymentPercent = val;
-    if (this.showRequest && this.showRequest.contractAmount) {
-      this.paymentAmount = Math.round((val / 100) * this.showRequest.contractAmount);
-    } else {
-      this.paymentAmount = 0;
-    }
-  }
-  submitPayment(): void {
-    if (!this.showRequest || !this.paymentAmount || !this.paymentPercent) return;
-    const contract = this.showRequest;
-    const payments = Array.isArray(contract.payments) ? contract.payments : [];
-    const newRound = payments.length + 1;
-    let applicant = '未知';
-    const user = this.user;
-    if (user && typeof user === 'object' && 'displayName' in user) {
-      applicant = (user as any).displayName || '未知';
-    } else if (typeof user === 'string') {
-      applicant = user;
-    }
-    const record: PaymentRecord = {
-      round: newRound,
-      date: new Date().toISOString(),
-      amount: this.paymentAmount!,
-      percent: this.paymentPercent!,
-      applicant,
-      note: this.paymentNote,
-      status: '初始'
-    };
-    payments.push(record);
-    if ((contract as any).id) {
-      const contractDoc = firestoreDoc(this.firestore, 'contracts', (contract as any).id);
-      updateDoc(contractDoc, { payments });
-    }
-    this.paymentAmount = null;
-    this.paymentPercent = null;
-    this.paymentNote = '';
-    this.showRequest = null;
-  }
+  // 請款相關方法已移除
   toStatus(contract: Contract, payment: PaymentRecord, status: PaymentRecord['status']): void {
     payment.status = status;
     this.updatePaymentStatusFirestore(contract);
@@ -301,6 +247,9 @@ export class ContractComponent implements OnInit, OnDestroy {
       const contractDoc = firestoreDoc(this.firestore, 'contracts', (contract as any).id);
       updateDoc(contractDoc, { payments: contract.payments });
     }
+  }
+  onRequestCompleted() {
+    // 可根據需要刷新 contracts 或顯示提示，這裡保持極簡
   }
 
   // --------------------
