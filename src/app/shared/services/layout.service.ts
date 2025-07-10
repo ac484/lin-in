@@ -16,7 +16,7 @@ export class LayoutService {
     preset: 'Aura',
     primary: 'emerald',
     surface: null,
-    darkMode: false,
+    darkMode: typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches,
   };
 
   appState = signal<AppState>(this._appState);
