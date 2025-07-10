@@ -8,7 +8,7 @@ import { Subject, Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { PrimeNgModule } from '../../shared/modules/prime-ng.module';
 import { FormsModule } from '@angular/forms';
-import { Firestore, collection, addDoc, doc, runTransaction, collectionData, DocumentData } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, doc, runTransaction, collectionData, DocumentData, doc as firestoreDoc, updateDoc } from '@angular/fire/firestore';
 import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage';
 
 export interface Contract {
@@ -26,6 +26,7 @@ export interface Contract {
   invoiceStatus: string;
   pendingPercent: number;
   note: string;
+  url?: string; // 檔案下載連結
 }
 
 @Component({
@@ -53,6 +54,7 @@ export class ContractComponent implements OnDestroy {
       return n1 - n2;
     });
   }
+  uploadingContractCode: string | null = null;
 
   constructor() {
     inject(AuthService).user$
@@ -109,6 +111,31 @@ export class ContractComponent implements OnDestroy {
       };
       transaction.set(doc(contractsCol), contract);
     });
+  }
+
+  async onContractFileSelected(event: Event, contract: Contract & { id?: string }): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    this.uploadingContractCode = contract.code;
+    try {
+      // 1. 上傳到 Storage
+      const filePath = `contracts/${contract.code}_${Date.now()}_${file.name}`;
+      const storageRef = ref(this.storage, filePath);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+
+      // 2. 更新 Firestore 合約文件
+      if (contract.id) {
+        const contractDoc = firestoreDoc(this.firestore, 'contracts', contract.id);
+        await updateDoc(contractDoc, { url });
+      }
+      // 3. 本地同步（可選，若有即時監聽可省略）
+      contract.url = url;
+    } finally {
+      this.uploadingContractCode = null;
+      input.value = '';
+    }
   }
 
   ngOnDestroy() {
