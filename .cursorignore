@@ -55,20 +55,3 @@ ui-debug.log
 *.tgz
 *.tar.gz
 
-docs/
-public/
-pnpm-lock.yaml
-.gitignore
-tsconfig.app.json
-tsconfig.json
-tsconfig.spec.json
-src/app/workspace/dock/panelmenu
-src/app/workspace/dock/megamenu
-
-storage.rules
-firestore.rules
-/functions
-/src/assets
-firebase.json
-firestore.indexes.json
-src/favicon.ico

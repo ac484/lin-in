@@ -8,6 +8,7 @@ import { AuthService } from '../service/auth/auth.service';
 import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
+import { MenubarModule } from 'primeng/menubar';
 
 @Component({
   selector: 'app-topbar',
@@ -19,9 +20,11 @@ import { InputTextModule } from 'primeng/inputtext';
     AppConfig,
     DialogModule,
     FormsModule,
-    InputTextModule
+    InputTextModule,
+    MenubarModule
   ],
   template: `
+    <p-menubar [model]="menuItems"></p-menubar>
     <div class="bg-surface-0 dark:bg-surface-900 p-6 rounded-2xl max-w-7xl mx-auto border border-surface-200 dark:border-surface-700 w-full">
       <div class="flex justify-between items-center">
         <div class="flex gap-3 items-center">
@@ -211,6 +214,12 @@ export class AppTopbar {
   password = '';
   error = '';
   success = '';
+
+  menuItems = [
+    { label: '首頁', icon: 'pi pi-home', routerLink: '/' },
+    { label: '儀表板', icon: 'pi pi-chart-bar', routerLink: '/dashboard' },
+    { label: '關於', icon: 'pi pi-info-circle', routerLink: '/about' }
+  ];
 
   constructor(public auth: AuthService) {}
 
