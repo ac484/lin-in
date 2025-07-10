@@ -23,14 +23,9 @@
     color: var(--text-color);
   }
 }
-.organization-chart-top {
-  margin-bottom: 1.5rem;
-}
-.text-xs { font-size: 0.75rem; color: var(--text-color-secondary); }
-.font-bold { font-weight: 700; }
+// .organization-chart-top, .font-bold, .text-xs, .text-gray-500 樣式已遷移
 .text-blue-600 { color: var(--primary-color); }
 .text-red-600 { color: var(--red-600); }
-.text-gray-500 { color: var(--text-color-secondary); }
 .position-relative { position: relative; }
 .full-height { height: 100%; }
 .border-none { border: none !important; }

@@ -1,0 +1,10 @@
+<div class="w-full organization-chart-top">
+  <p-organizationChart [collapsible]="true" [value]="[getOrgChartData(contract)]" styleClass="w-full">
+    <ng-template let-node pTemplate="person">
+      <div class="flex flex-col items-center">
+        <span class="font-bold mb-1">{{ node.data.name || '—' }}</span>
+        <span class="text-xs text-gray-500">{{ node.data.role || '—' }}</span>
+      </div>
+    </ng-template>
+  </p-organizationChart>
+</div>

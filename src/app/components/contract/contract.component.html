@@ -16,16 +16,7 @@
   <ng-template #panel>
     <div class="flex flex-col items-center justify-start h-full gap-2">
       <!-- 組織圖 -->
-      <div class="w-full organization-chart-top">
-        <p-organizationChart [collapsible]="true" [value]="[selectedContract ? getOrgChartData(selectedContract) : getDefaultOrgChartData()]" styleClass="w-full" >
-          <ng-template let-node pTemplate="person">
-            <div class="flex flex-col items-center">
-              <span class="font-bold mb-1">{{ node.data.name || '—' }}</span>
-              <span class="text-xs text-gray-500">{{ node.data.role || '—' }}</span>
-            </div>
-          </ng-template>
-        </p-organizationChart>
-      </div>
+      <app-organizational [contract]="selectedContract" [defaultLabel]="selectedContract?.projectName || '專案團隊'"></app-organizational>
       <!-- 合約列表 Table -->
       <p-table [value]="contracts" styleClass="p-datatable-sm w-full" [tableStyle]="{ 'font-size': '13px' }" [responsiveLayout]="'scroll'"
         selectionMode="single" [(selection)]="selectedContract" dataKey="code" [rowHover]="true"

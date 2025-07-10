@@ -17,9 +17,9 @@ import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage
 import { PdfA4Pipe } from '../../shared/pipes/pdf-a4.pipe';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { StepButtonComponent } from './stepbutton/create/create.component';
-import { OrganizationChartModule } from 'primeng/organizationchart';
 import { MessagesComponent } from './stepbutton/messages/messages.component';
 import { FileComponent } from './stepbutton/file/file.component';
+import { OrganizationalComponent } from './stepbutton/organizational/organizational.component';
 import { collection as firestoreCollection, query, where, orderBy, onSnapshot, addDoc, deleteDoc, serverTimestamp, getDocs, Timestamp, QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { Injector, runInInjectionContext } from '@angular/core';
 
@@ -67,7 +67,7 @@ interface Message {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, StepButtonComponent, OrganizationChartModule, MessagesComponent, FileComponent],
+  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, StepButtonComponent, MessagesComponent, FileComponent, OrganizationalComponent],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
@@ -86,7 +86,6 @@ export class ContractComponent implements OnInit, OnDestroy {
   paymentAmount: number | null = null;
   paymentPercent: number | null = null;
   paymentNote = '';
-  orgChartExpanded = true;
   // 備忘錄相關屬性移除
 
   // --------------------
@@ -118,35 +117,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   // --------------------
   // 組織圖資料
   // --------------------
-  getOrgChartData(contract: Contract): any {
-    return {
-      label: contract.projectName || '專案團隊',
-      expanded: true,
-      children: (contract.members && contract.members.length > 0
-        ? contract.members
-        : [
-            { name: '', role: '' },
-            { name: '', role: '' },
-            { name: '', role: '' }
-          ]
-      ).map(m => ({
-        label: m.role || '角色',
-        type: 'person',
-        data: m
-      }))
-    };
-  }
-  getDefaultOrgChartData(): any {
-    return {
-      label: this.selectedContract?.projectName || '專案團隊',
-      expanded: this.orgChartExpanded,
-      children: [
-        { label: '角色', type: 'person', data: { name: '', role: '' }, expanded: this.orgChartExpanded },
-        { label: '角色', type: 'person', data: { name: '', role: '' }, expanded: this.orgChartExpanded },
-        { label: '角色', type: 'person', data: { name: '', role: '' }, expanded: this.orgChartExpanded }
-      ]
-    };
-  }
+  // 刪除 orgChartExpanded, getOrgChartData, getDefaultOrgChartData
 
   // --------------------
   // Constructor
