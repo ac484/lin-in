@@ -1,0 +1,4 @@
+/* 可留空，或加一點 Splitter 高度樣式 */
+:host ::ng-deep .p-splitter {
+  min-height: 100%;
+}

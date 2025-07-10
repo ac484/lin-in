@@ -1,0 +1,17 @@
+<ng-container *ngIf="!loading">
+  <ng-container *ngIf="user">
+    <div class="card">
+      <p-splitter [style]="{ height: '300px' }" class="mb-8">
+        <ng-template pSplitterPanel [size]="30">
+          <div class="flex items-center justify-center h-full">Panel 1 (左 30%)</div>
+        </ng-template>
+        <ng-template pSplitterPanel [size]="60">
+          <div class="flex items-center justify-center h-full">Panel 2 (中 60%)</div>
+        </ng-template>
+        <ng-template pSplitterPanel [size]="10">
+          <div class="flex items-center justify-center h-full">Panel 3 (右 10%)</div>
+        </ng-template>
+      </p-splitter>
+    </div>
+  </ng-container>
+</ng-container>

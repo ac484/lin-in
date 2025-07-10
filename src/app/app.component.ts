@@ -19,7 +19,6 @@ export const globalMessageBus = new Subject<GlobalMessage>();
   selector: 'app-root',
   imports: [AppTopbar, AppFooter, RouterModule, PrimeNgModule, ToastModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
   providers: [MessageService]
 })
 export class AppComponent {
