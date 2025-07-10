@@ -126,6 +126,13 @@ export class AppConfig {
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+      const primary = localStorage.getItem('primary');
+      const surface = localStorage.getItem('surface');
+      this.layoutService.appState.update((state: any) => ({
+        ...state,
+        primary: primary || state.primary,
+        surface: surface || state.surface,
+      }));
       this.onPresetChange(this.layoutService.appState().preset);
     }
   }
@@ -416,14 +423,19 @@ export class AppConfig {
         ...state,
         primary: color.name,
       }));
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('primary', color.name);
+      }
     } else if (type === 'surface') {
       this.layoutService.appState.update((state: any) => ({
         ...state,
         surface: color.name,
       }));
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('surface', color.name);
+      }
     }
     this.applyTheme(type, color);
-
     event.stopPropagation();
   }
 
