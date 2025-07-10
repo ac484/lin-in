@@ -7,39 +7,26 @@
 
 .splitter-left {
   transition: width 0.1s;
-  min-width: 80px;
-  background: #fff;
 }
 
 .splitter-bar {
-  width: 16px;
+  width: 32px;
   cursor: col-resize;
   background: transparent;
-  transition: background 0.2s;
-  z-index: 1;
-  box-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  user-select: none;
 }
-.splitter-bar svg {
-  width: 16px;
-  height: 32px;
-  display: block;
+.splitter-icon {
+  font-family: monospace;
+  font-size: 20px;
+  color: #888;
+  transition: color 0.2s;
+  pointer-events: none;
 }
-.splitter-bar polyline {
-  stroke: #888;
-  transition: stroke 0.2s;
-}
-.splitter-bar:hover polyline,
-.splitter-bar.active polyline {
-  stroke: #1976d2;
-}
+
 
 .splitter-right {
   flex: 1 1 0;
-  min-width: 80px;
-  margin-left: 8px;
-  background: #fff;
 }

@@ -9,18 +9,8 @@ import { CommonModule } from '@angular/common';
     <div class="splitter-left" [style.flex]="'0 0 ' + leftWidth + 'px'" [style.minWidth.px]="min">
       <ng-content select="[left]"></ng-content>
     </div>
-    <div
-      class="splitter-bar"
-      [class.active]="dragging"
-      [class.hover]="hover && !dragging"
-      (mousedown)="startDrag($event)"
-      (mouseenter)="hover=true"
-      (mouseleave)="hover=false"
-    >
-      <svg width="16" height="32" viewBox="0 0 16 32" style="display:block;margin:auto;" aria-hidden="true">
-        <polyline points="6,10 2,16 6,22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <polyline points="10,10 14,16 10,22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+    <div class="splitter-bar" (mousedown)="startDrag($event)">
+      <span class="splitter-icon">&lt;&gt;</span>
     </div>
     <div class="splitter-right">
       <ng-content select="[right]"></ng-content>
@@ -33,8 +23,6 @@ export class SplitterComponent {
   @Input() min = 80;
   @Output() leftWidthChange = new EventEmitter<number>();
   leftWidth = 200;
-  dragging = false;
-  hover = false;
   private startX = 0;
   private startWidth = 0;
 
@@ -45,7 +33,6 @@ export class SplitterComponent {
   }
 
   startDrag(event: MouseEvent): void {
-    this.dragging = true;
     this.startX = event.clientX;
     this.startWidth = this.leftWidth;
     const mouseMove = (e: MouseEvent) => {
@@ -54,7 +41,6 @@ export class SplitterComponent {
       this.leftWidthChange.emit(newWidth);
     };
     const mouseUp = () => {
-      this.dragging = false;
       this.renderer.removeClass(document.body, 'no-select');
       window.removeEventListener('mousemove', mouseMove);
       window.removeEventListener('mouseup', mouseUp);
