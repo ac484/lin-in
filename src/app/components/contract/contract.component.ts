@@ -18,6 +18,7 @@ import { StepButtonComponent } from './stepbutton/create/create.component';
 import { OrganizationChartModule } from 'primeng/organizationchart';
 // 只保留 @angular/fire/firestore 的 import，移除重複
 import { collection as firestoreCollection, query, where, orderBy, onSnapshot, addDoc, deleteDoc, serverTimestamp, getDocs, Timestamp, QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
+import { Injector, runInInjectionContext } from '@angular/core';
 
 export interface PaymentRecord {
   round: number;
@@ -71,6 +72,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   private toastShown = false;
   private firestore = inject(Firestore);
   private storage = inject(Storage);
+  private injector = inject(Injector);
   firestoreContracts$: Observable<Contract[] | null>;
   _contracts: Contract[] | null = null;
   get contracts(): Contract[] {
@@ -162,9 +164,11 @@ export class ContractComponent implements OnInit, OnDestroy {
     this.loadingMessages = true;
     const messagesCol = firestoreCollection(this.firestore, 'messages');
     const q = query(messagesCol, where('contractId', '==', this.selectedContract.code), orderBy('createdAt', 'desc'));
-    this.messagesUnsub = onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
-      this.messages = snap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() } as Message));
-      this.loadingMessages = false;
+    runInInjectionContext(this.injector, () => {
+      this.messagesUnsub = onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
+        this.messages = snap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() } as Message));
+        this.loadingMessages = false;
+      });
     });
   }
 
