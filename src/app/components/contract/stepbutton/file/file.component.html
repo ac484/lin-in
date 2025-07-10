@@ -6,4 +6,3 @@
   <input type="file" class="hidden" accept="application/pdf,image/*" (change)="onFileSelected($event)" [disabled]="!!contract.url || uploadingContractCode === contract.code" />
 </label>
 <span *ngIf="uploadingContractCode === contract.code" class="text-xs text-gray-500 ml-2">上傳中...</span>
-<a *ngIf="contract.url" [href]="contract.url" target="_blank" class="ml-2 text-blue-600 underline">檢視</a>

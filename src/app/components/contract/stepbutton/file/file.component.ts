@@ -4,10 +4,12 @@ import { Contract } from '../../contract.component';
 import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage';
 import { Firestore, doc as firestoreDoc, updateDoc } from '@angular/fire/firestore';
 import { PdfA4Pipe } from '../../../../shared/pipes/pdf-a4.pipe';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-file',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './file.component.html',
   styleUrls: ['./file.component.scss']
 })
