@@ -1,5 +1,6 @@
-// PrimeNG 核心模組
+import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MessageModule } from 'primeng/message';
 // PrimeNG 按鈕模組
 import { ButtonModule } from 'primeng/button';
 // PrimeNG 輸入框模組
@@ -68,45 +69,78 @@ import { DragDropModule } from 'primeng/dragdrop';
 // import { ChipsModule } from 'primeng/chips'; // 若未安裝可先註解
 import { ScrollerModule } from 'primeng/scroller';
 
-
-export const PrimeNgModules = [
-  CommonModule, // 核心模組
-  ButtonModule, // 按鈕
-  InputTextModule, // 輸入框
-  CardModule, // 卡片
-  ToolbarModule, // 工具列
-  MenuModule, // 選單
-  RippleModule, // 漣漪效果
-  ToastModule, // 提示訊息
-  DialogModule, // 對話框
-  TableModule, // 表格
-  CheckboxModule, // 核取方塊
-  RadioButtonModule, // 單選按鈕
-  InputNumberModule, // 數字輸入
-
-  PanelModule, // 面板
-  AccordionModule, // 手風琴
-  ProgressSpinnerModule, // 輪播進度
-  ConfirmDialogModule, // 確認對話框
-  TooltipModule, // 工具提示
-  FileUploadModule, // 檔案上傳
-  DynamicDialogRef, // 動態對話框
-  SplitButtonModule, // 分割按鈕
-  DataViewModule, // 資料檢視
-  TreeModule, // 樹狀結構
-  MenubarModule, // 選單列
-  TimelineModule, // 時間軸
-  OrganizationChartModule, // 組織結構圖
-  SplitterModule, // 分割面板
-  TreeTableModule, // 樹狀表格
-  ProgressBarModule, // 進度條
-  TagModule, // 標籤
-  BadgeModule, // 徽章
-  ContextMenuModule, // Tree 右鍵選單
-  DragDropModule, // Tree 拖曳
-  ScrollerModule, // 虛擬捲動
-  DialogService, // 動態對話框服務
-  // ChipsModule // 多值標籤（如未安裝請勿加入）
-  // 其他 PrimeNG 模組請加在此處
-];
-// DialogService 不需加入陣列，僅用於依賴注入
+@NgModule({
+  imports: [
+    CommonModule,
+    MessageModule,
+    ButtonModule,
+    InputTextModule,
+    CardModule,
+    ToolbarModule,
+    MenuModule,
+    RippleModule,
+    ToastModule,
+    DialogModule,
+    TableModule,
+    CheckboxModule,
+    RadioButtonModule,
+    InputNumberModule,
+    PanelModule,
+    AccordionModule,
+    ProgressSpinnerModule,
+    ConfirmDialogModule,
+    TooltipModule,
+    FileUploadModule,
+    SplitButtonModule,
+    DataViewModule,
+    TreeModule,
+    MenubarModule,
+    TimelineModule,
+    OrganizationChartModule,
+    SplitterModule,
+    TreeTableModule,
+    ProgressBarModule,
+    TagModule,
+    BadgeModule,
+    ContextMenuModule,
+    DragDropModule,
+    ScrollerModule,
+  ],
+  exports: [
+    CommonModule,
+    MessageModule,
+    ButtonModule,
+    InputTextModule,
+    CardModule,
+    ToolbarModule,
+    MenuModule,
+    RippleModule,
+    ToastModule,
+    DialogModule,
+    TableModule,
+    CheckboxModule,
+    RadioButtonModule,
+    InputNumberModule,
+    PanelModule,
+    AccordionModule,
+    ProgressSpinnerModule,
+    ConfirmDialogModule,
+    TooltipModule,
+    FileUploadModule,
+    SplitButtonModule,
+    DataViewModule,
+    TreeModule,
+    MenubarModule,
+    TimelineModule,
+    OrganizationChartModule,
+    SplitterModule,
+    TreeTableModule,
+    ProgressBarModule,
+    TagModule,
+    BadgeModule,
+    ContextMenuModule,
+    DragDropModule,
+    ScrollerModule,
+  ]
+})
+export class PrimeNgModule {}
