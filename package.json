@@ -29,6 +29,12 @@
     "@angular/material": "20.1.0",
     "@angular/platform-browser": "^20.0.0",
     "@angular/router": "^20.0.0",
+    "ng-zorro-antd": "^20.0.0",
+    "@delon/theme": "^20.0.0",
+    "@delon/abc": "^20.0.0",
+    "@delon/util": "^20.0.0",
+    "@delon/acl": "^20.0.0",
+    "@delon/form": "^20.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
