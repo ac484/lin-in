@@ -128,6 +128,8 @@ export class ContractComponent implements OnInit, OnDestroy {
   newMessage = '';
   loadingMessages = false;
   private messagesUnsub: (() => void) | null = null;
+  memoTimestamps: number[] = [];
+  memoError = '';
 
   constructor() {
     inject(AuthService).user$
@@ -156,6 +158,43 @@ export class ContractComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.listenMessages();
+    this.loadMemoTimestamps();
+  }
+
+  loadMemoTimestamps(): void {
+    const raw = localStorage.getItem('contract_memo_timestamps');
+    this.memoTimestamps = raw ? JSON.parse(raw) : [];
+    this.cleanupMemoTimestamps();
+  }
+
+  saveMemoTimestamps(): void {
+    localStorage.setItem('contract_memo_timestamps', JSON.stringify(this.memoTimestamps));
+  }
+
+  cleanupMemoTimestamps(): void {
+    const now = Date.now();
+    // 只保留 30 天內的紀錄
+    this.memoTimestamps = this.memoTimestamps.filter(ts => now - ts < 30 * 24 * 60 * 60 * 1000);
+    this.saveMemoTimestamps();
+  }
+
+  getMemoCooldown(): number {
+    const now = Date.now();
+    this.cleanupMemoTimestamps();
+    // 5分鐘內只能新增1則
+    const last5min = this.memoTimestamps.filter(ts => now - ts < 5 * 60 * 1000).length;
+    if (last5min >= 1) return 5 * 60 * 1000;
+    // 1小時內超過10則
+    const last1hr = this.memoTimestamps.filter(ts => now - ts < 60 * 60 * 1000).length;
+    if (last1hr >= 10) return 10 * 60 * 1000;
+    // 24小時內超過30則
+    const last24hr = this.memoTimestamps.filter(ts => now - ts < 24 * 60 * 60 * 1000).length;
+    if (last24hr >= 30) return 60 * 60 * 1000;
+    // 30天內超過200則
+    const last30d = this.memoTimestamps.length;
+    if (last30d >= 200) return 24 * 60 * 60 * 1000;
+    // 正常情況
+    return 0;
   }
 
   listenMessages(): void {
@@ -172,16 +211,26 @@ export class ContractComponent implements OnInit, OnDestroy {
     });
   }
 
-  async sendMessage(): Promise<void> {
+  async addMemo(): Promise<void> {
     if (!this.newMessage.trim() || !this.selectedContract) return;
+    const now = Date.now();
+    const cooldown = this.getMemoCooldown();
+    const lastTs = this.memoTimestamps.length > 0 ? this.memoTimestamps[this.memoTimestamps.length - 1] : 0;
+    if (cooldown > 0 && now - lastTs < cooldown) {
+      this.memoError = `備忘錄新增過於頻繁，請稍候 ${(Math.ceil((cooldown - (now - lastTs))/1000))} 秒再試。`;
+      return;
+    }
+    this.memoError = '';
     const messagesCol = firestoreCollection(this.firestore, 'messages');
     await addDoc(messagesCol, {
       contractId: this.selectedContract.code,
       user: this.user?.displayName || '匿名',
       message: this.newMessage.trim(),
       createdAt: serverTimestamp(),
-      expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24小時後
+      expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
     });
+    this.memoTimestamps.push(now);
+    this.saveMemoTimestamps();
     this.newMessage = '';
   }
 
@@ -446,6 +495,10 @@ export class ContractComponent implements OnInit, OnDestroy {
     // JS Date
     if (msg.createdAt instanceof Date) return msg.createdAt;
     return null;
+  }
+
+  getNow(): number {
+    return Date.now();
   }
 
   ngOnDestroy() {
