@@ -63,6 +63,7 @@ export class ContractComponent implements OnDestroy {
   private pdfA4Pipe = new PdfA4Pipe();
   private sanitizer = inject(DomSanitizer);
   dragging = false;
+  draggingVertical = false;
 
   constructor() {
     inject(AuthService).user$
@@ -182,6 +183,13 @@ export class ContractComponent implements OnDestroy {
   }
   onSplitterResizeEnd(): void {
     this.dragging = false;
+  }
+
+  onVerticalSplitterResizeStart(): void {
+    this.draggingVertical = true;
+  }
+  onVerticalSplitterResizeEnd(): void {
+    this.draggingVertical = false;
   }
 
   ngOnDestroy() {

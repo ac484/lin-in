@@ -74,7 +74,9 @@
     </ng-template>
   <!-- Panel 2: 中間，垂直再分上下 -->
     <ng-template #panel [stateKey]="'panel2'">
-      <p-splitter layout="vertical" [panelSizes]="[70, 30]">
+      <p-splitter layout="vertical" [panelSizes]="[70, 30]"
+        (onResizeStart)="onVerticalSplitterResizeStart()"
+        (onResizeEnd)="onVerticalSplitterResizeEnd()">
         <ng-template #panel [stateKey]="'panel2-top'">
           <div class="flex flex-col items-center justify-center h-full w-full" style="position: relative;">
             <object
@@ -89,8 +91,8 @@
             </object>
             <!-- 拖曳時顯示遮罩 -->
             <div
-              *ngIf="dragging"
-              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: transparent; cursor: col-resize;"
+              *ngIf="dragging || draggingVertical"
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: transparent; cursor: move;"
             ></div>
             <div *ngIf="!safeUrl" class="text-gray-500">
               請選擇有 PDF 檔案的合約
