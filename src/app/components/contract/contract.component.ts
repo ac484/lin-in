@@ -23,7 +23,7 @@ export interface PaymentRecord {
   percent: number;
   applicant: string;
   note?: string;
-  status?: string;
+  status?: '初始' | '申請中' | '審核中' | '開票中' | '放款中' | '完成' | '已拒絕';
 }
 
 export interface Contract {
@@ -75,6 +75,7 @@ export class ContractComponent implements OnDestroy {
   paymentAmount: number | null = null;
   paymentPercent: number | null = null;
   paymentNote = '';
+  readonly statusList: PaymentRecord['status'][] = ['初始','申請中','審核中','開票中','放款中','完成'];
 
   constructor() {
     inject(AuthService).user$
@@ -281,7 +282,7 @@ export class ContractComponent implements OnDestroy {
       percent: this.paymentPercent!,
       applicant,
       note: this.paymentNote,
-      status: '申請中'
+      status: '初始'
     };
     payments.push(record);
     // Firestore 寫入
@@ -293,6 +294,50 @@ export class ContractComponent implements OnDestroy {
     this.paymentPercent = null;
     this.paymentNote = '';
     this.showRequest = null;
+  }
+
+  toStatus(contract: Contract, payment: PaymentRecord, status: PaymentRecord['status']): void {
+    payment.status = status;
+    this.updatePaymentStatusFirestore(contract);
+  }
+
+  updatePaymentStatusFirestore(contract: Contract): void {
+    if ((contract as any).id) {
+      const contractDoc = firestoreDoc(this.firestore, 'contracts', (contract as any).id);
+      updateDoc(contractDoc, { payments: contract.payments });
+    }
+  }
+
+  getInvoicedPercent(contract: Contract): number {
+    if (!contract.invoicedAmount || !contract.contractAmount) return 0;
+    return Math.round((contract.invoicedAmount / contract.contractAmount) * 100);
+  }
+
+  getStatusPercent(contract: Contract, status: PaymentRecord['status']): number {
+    if (!contract.payments || !contract.contractAmount) return 0;
+    const total = contract.payments
+      .filter(p => p.status === status)
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+    return Math.round((total / contract.contractAmount) * 100);
+  }
+
+  getEventLog(contract: Contract): string[] {
+    if (!contract.payments) return [];
+    return contract.payments.map(p =>
+      `第${p.round}次 [${p.status ?? '未知'}] 金額${p.percent}% 申請人${p.applicant}` +
+      (p.date ? ` 日期${p.date.slice(0, 10)}` : '') +
+      (p.note ? ` 備註${p.note}` : '')
+    );
+  }
+
+  getEventTimeline(contract: Contract): { label: string; date: string }[] {
+    if (!contract.payments) return [];
+    return contract.payments.map(p => ({
+      label:
+        `第${p.round}次 [${p.status ?? '未知'}] 金額${p.percent}% 申請人${p.applicant}` +
+        (p.note ? ` 備註${p.note}` : ''),
+      date: p.date || ''
+    }));
   }
 
   ngOnDestroy() {

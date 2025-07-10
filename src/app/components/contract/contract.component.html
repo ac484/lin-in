@@ -75,20 +75,37 @@
                     <span>申請人：{{ p.applicant }}</span>
                     <span *ngIf="p.note">備註：{{ p.note }}</span>
                     <span>狀態：{{ p.status || '未知' }}</span>
+                    <ng-container *ngIf="p.status === '初始'">
+                      <button pButton type="button" label="送出申請" class="p-button-sm ml-2" (click)="toStatus(contract, p, '申請中')"></button>
+                    </ng-container>
+                    <ng-container *ngIf="p.status === '申請中'">
+                      <button pButton type="button" label="送審" class="p-button-sm ml-2" (click)="toStatus(contract, p, '審核中')"></button>
+                      <button pButton type="button" label="拒絕" class="p-button-sm ml-2 p-button-danger" (click)="toStatus(contract, p, '已拒絕')"></button>
+                    </ng-container>
+                    <ng-container *ngIf="p.status === '審核中'">
+                      <button pButton type="button" label="開票" class="p-button-sm ml-2" (click)="toStatus(contract, p, '開票中')"></button>
+                      <button pButton type="button" label="拒絕" class="p-button-sm ml-2 p-button-danger" (click)="toStatus(contract, p, '已拒絕')"></button>
+                    </ng-container>
+                    <ng-container *ngIf="p.status === '開票中'">
+                      <button pButton type="button" label="放款" class="p-button-sm ml-2" (click)="toStatus(contract, p, '放款中')"></button>
+                    </ng-container>
+                    <ng-container *ngIf="p.status === '放款中'">
+                      <button pButton type="button" label="完成" class="p-button-sm ml-2" (click)="toStatus(contract, p, '完成')"></button>
+                    </ng-container>
                   </div>
                 </ng-container>
                 <ng-template #noPayments>
                   <span>尚無請款紀錄</span>
                 </ng-template>
-                <div class="flex flex-wrap gap-2 items-center mt-2">
-                  <span>請款狀態: {{ contract.paymentStatus }}</span>
-                  <span>發票狀態: {{ contract.invoiceStatus }}</span>
-                  <span>第 {{ contract.paymentRound }} 次請款</span>
-                  <span>備註: {{ contract.note }}</span>
-                  <span class="flex items-center">尚未請款:
-                    <input type="range" min="0" max="100" [ngModel]="contract.pendingPercent" class="w-32 align-middle mx-2" disabled />
-                    <span>{{ contract.pendingPercent }}%</span>
-                  </span>
+                <div class="flex flex-col gap-2 mt-2">
+                  <div *ngFor="let s of statusList" class="flex items-center gap-2">
+                    <span style="min-width: 60px;">{{ s }}</span>
+                    <p-progressBar [value]="getStatusPercent(contract, s)" [showValue]="true" style="flex:1; min-width:120px;"></p-progressBar>
+                    <span style="min-width: 32px; text-align:right;">{{ getStatusPercent(contract, s) }}%</span>
+                  </div>
+                </div>
+                <div *ngIf="getStatusPercent(contract, '已拒絕') > 0" class="text-red-600 mt-2">
+                  已拒絕: {{ getStatusPercent(contract, '已拒絕') }}%（退件不計入流程進度）
                 </div>
               </div>
             </td>
@@ -123,17 +140,19 @@
   <!-- Panel 3: 右側，單一區 -->
   <ng-template #panel [stateKey]="'panel3'">
     <div class="flex flex-col items-center justify-center h-full gap-2 w-full">
-      <p-timeline [value]="selectedContract ? [selectedContract] : []" align="alternate" *ngIf="selectedContract">
+      <p-timeline [value]="selectedContract ? getEventTimeline(selectedContract) : []" align="alternate" *ngIf="selectedContract">
         <ng-template pTemplate="content" let-item>
           <div>
-            <div>合約編號：{{ item.code }}</div>
-            <div>狀態：{{ item.status }}</div>
-            <div>專案名稱：{{ item.projectName }}</div>
-            <div *ngIf="item.url"><a [href]="item.url" target="_blank" class="text-blue-600 underline">檢視檔案</a></div>
+            <div>{{ item.label }}</div>
+            <div class="text-xs text-gray-500">{{ item.date | date:'yyyy/MM/dd HH:mm' }}</div>
           </div>
         </ng-template>
       </p-timeline>
       <div *ngIf="!selectedContract" class="text-gray-500">請選擇合約以檢視歷程</div>
+      <div *ngIf="selectedContract" style="width:100%;">
+        <div class="font-bold mb-2">事件紀錄</div>
+        <div *ngFor="let log of getEventLog(selectedContract)" class="text-xs mb-1">{{ log }}</div>
+      </div>
     </div>
   </ng-template>
 </p-splitter>
