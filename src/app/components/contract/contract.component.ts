@@ -1,4 +1,7 @@
 // 本檔案依據 Firebase Console 專案設定，使用 Firebase Client SDK 操作 Cloud Firestore。
+// --------------------
+// 型別定義區
+// --------------------
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -16,7 +19,6 @@ import { TimelineModule } from 'primeng/timeline';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { StepButtonComponent } from './stepbutton/create/create.component';
 import { OrganizationChartModule } from 'primeng/organizationchart';
-// 只保留 @angular/fire/firestore 的 import，移除重複
 import { collection as firestoreCollection, query, where, orderBy, onSnapshot, addDoc, deleteDoc, serverTimestamp, getDocs, Timestamp, QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { Injector, runInInjectionContext } from '@angular/core';
 
@@ -58,6 +60,9 @@ interface Message {
   createdAt: Date | Timestamp;
 }
 
+// --------------------
+// Component 區
+// --------------------
 @Component({
   selector: 'app-contract',
   standalone: true,
@@ -66,31 +71,56 @@ interface Message {
   styleUrls: ['./contract.component.scss']
 })
 export class ContractComponent implements OnInit, OnDestroy {
+  // --------------------
+  // UI 狀態屬性
+  // --------------------
   user: any = null; // 明確型別
   loading = true;
-  private destroyed$ = new Subject<void>();
-  private toastShown = false;
-  private firestore = inject(Firestore);
-  private storage = inject(Storage);
-  private injector = inject(Injector);
-  firestoreContracts$: Observable<Contract[] | null>;
-  _contracts: Contract[] | null = null;
-  get contracts(): Contract[] {
-    return (this._contracts ?? []).slice().sort((a, b) => parseInt(a.code.replace('C-', ''), 10) - parseInt(b.code.replace('C-', ''), 10));
-  }
   uploadingContractCode: string | null = null;
   selectedContract: Contract | null = null;
   safeUrl: SafeResourceUrl | null = null;
-  private pdfA4Pipe = new PdfA4Pipe();
-  private sanitizer = inject(DomSanitizer);
-  dragging = false; // 合併 dragging 狀態
+  dragging = false;
   showStepper = false;
   showRequest: Contract | null = null;
   paymentAmount: number | null = null;
   paymentPercent: number | null = null;
   paymentNote = '';
+  orgChartExpanded = true;
+  messages: Message[] = [];
+  newMessage = '';
+  loadingMessages = false;
+  memoTimestamps: number[] = [];
+  memoError = '';
+
+  // --------------------
+  // Firestore/Storage/DI
+  // --------------------
+  private destroyed$ = new Subject<void>();
+  private toastShown = false;
+  private firestore = inject(Firestore);
+  private storage = inject(Storage);
+  private injector = inject(Injector);
+  private pdfA4Pipe = new PdfA4Pipe();
+  private sanitizer = inject(DomSanitizer);
+  private messagesUnsub: (() => void) | null = null;
+
+  // --------------------
+  // 資料流/常數
+  // --------------------
+  firestoreContracts$: Observable<Contract[] | null>;
+  _contracts: Contract[] | null = null;
   readonly statusList: PaymentRecord['status'][] = ['初始','申請中','審核中','開票中','放款中','完成'];
-  // 產生組織圖資料，未來可根據 contract 內容動態產生
+
+  // --------------------
+  // Getter
+  // --------------------
+  get contracts(): Contract[] {
+    return (this._contracts ?? []).slice().sort((a, b) => parseInt(a.code.replace('C-', ''), 10) - parseInt(b.code.replace('C-', ''), 10));
+  }
+
+  // --------------------
+  // 組織圖資料
+  // --------------------
   getOrgChartData(contract: Contract): any {
     return {
       label: contract.projectName || '專案團隊',
@@ -109,9 +139,6 @@ export class ContractComponent implements OnInit, OnDestroy {
       }))
     };
   }
-
-  orgChartExpanded = true; // 控制組織圖展開狀態
-
   getDefaultOrgChartData(): any {
     return {
       label: this.selectedContract?.projectName || '專案團隊',
@@ -124,13 +151,9 @@ export class ContractComponent implements OnInit, OnDestroy {
     };
   }
 
-  messages: Message[] = [];
-  newMessage = '';
-  loadingMessages = false;
-  private messagesUnsub: (() => void) | null = null;
-  memoTimestamps: number[] = [];
-  memoError = '';
-
+  // --------------------
+  // Constructor
+  // --------------------
   constructor() {
     inject(AuthService).user$
       .pipe(takeUntil(this.destroyed$))
@@ -153,50 +176,54 @@ export class ContractComponent implements OnInit, OnDestroy {
     const contractsCol = collection(this.firestore, 'contracts');
     this.firestoreContracts$ = collectionData(contractsCol, { idField: 'id' }) as Observable<Contract[] | null>;
     this.firestoreContracts$.pipe(takeUntil(this.destroyed$)).subscribe(data => { this._contracts = data; });
-    // this.listenMessages(); // <-- 移除這行，改用 ngOnInit
   }
 
+  // --------------------
+  // 生命週期
+  // --------------------
   ngOnInit(): void {
     this.listenMessages();
     this.loadMemoTimestamps();
   }
+  ngOnDestroy() {
+    if (this.messagesUnsub) this.messagesUnsub();
+    this.destroyed$.next();
+    this.destroyed$.complete();
+  }
 
+  // --------------------
+  // 本地儲存/備忘錄
+  // --------------------
   loadMemoTimestamps(): void {
     const raw = localStorage.getItem('contract_memo_timestamps');
     this.memoTimestamps = raw ? JSON.parse(raw) : [];
     this.cleanupMemoTimestamps();
   }
-
   saveMemoTimestamps(): void {
     localStorage.setItem('contract_memo_timestamps', JSON.stringify(this.memoTimestamps));
   }
-
   cleanupMemoTimestamps(): void {
     const now = Date.now();
-    // 只保留 30 天內的紀錄
     this.memoTimestamps = this.memoTimestamps.filter(ts => now - ts < 30 * 24 * 60 * 60 * 1000);
     this.saveMemoTimestamps();
   }
-
   getMemoCooldown(): number {
     const now = Date.now();
     this.cleanupMemoTimestamps();
-    // 5分鐘內只能新增1則
     const last5min = this.memoTimestamps.filter(ts => now - ts < 5 * 60 * 1000).length;
     if (last5min >= 1) return 5 * 60 * 1000;
-    // 1小時內超過10則
     const last1hr = this.memoTimestamps.filter(ts => now - ts < 60 * 60 * 1000).length;
     if (last1hr >= 10) return 10 * 60 * 1000;
-    // 24小時內超過30則
     const last24hr = this.memoTimestamps.filter(ts => now - ts < 24 * 60 * 60 * 1000).length;
     if (last24hr >= 30) return 60 * 60 * 1000;
-    // 30天內超過200則
     const last30d = this.memoTimestamps.length;
     if (last30d >= 200) return 24 * 60 * 60 * 1000;
-    // 正常情況
     return 0;
   }
 
+  // --------------------
+  // Firestore 留言相關
+  // --------------------
   listenMessages(): void {
     if (this.messagesUnsub) this.messagesUnsub();
     if (!this.selectedContract) return;
@@ -210,7 +237,6 @@ export class ContractComponent implements OnInit, OnDestroy {
       });
     });
   }
-
   async addMemo(): Promise<void> {
     if (!this.newMessage.trim() || !this.selectedContract) return;
     const now = Date.now();
@@ -233,9 +259,7 @@ export class ContractComponent implements OnInit, OnDestroy {
     this.saveMemoTimestamps();
     this.newMessage = '';
   }
-
   async removeExpiredMessages(): Promise<void> {
-    // 可定時呼叫，或用雲端函數自動清理
     const messagesCol = firestoreCollection(this.firestore, 'messages');
     const q = query(messagesCol, where('expireAt', '<=', new Date()));
     const snap = await getDocs(q);
@@ -244,25 +268,24 @@ export class ContractComponent implements OnInit, OnDestroy {
     }
   }
 
+  // --------------------
+  // UI 事件/操作
+  // --------------------
   isPdfUrl(url: string): boolean {
-    // 檢查URL是否包含.pdf，不管是否有查詢參數
     return url.includes('.pdf');
   }
-
   onRowSelect(event: any): void {
     if (event.data) {
       this.selectedContract = event.data as Contract;
       this.updateSafeUrl();
-      this.listenMessages(); // 每次選合約時都要重新監聽留言
+      this.listenMessages();
     }
   }
-
   selectContract(contract: Contract): void {
     this.selectedContract = contract;
     this.updateSafeUrl();
-    this.listenMessages(); // 每次選合約時都要重新監聽留言
+    this.listenMessages();
   }
-
   updateSafeUrl(): void {
     if (this.selectedContract && this.selectedContract.url && this.isPdfUrl(this.selectedContract.url)) {
       this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedContract.url);
@@ -270,9 +293,7 @@ export class ContractComponent implements OnInit, OnDestroy {
       this.safeUrl = null;
     }
   }
-
   async addContract(): Promise<void> {
-    // 取得並遞增 contract_serial
     const serialDoc = doc(this.firestore, 'meta/contract_serial');
     const contractsCol = collection(this.firestore, 'contracts');
     await runTransaction(this.firestore, async (transaction) => {
@@ -304,23 +325,19 @@ export class ContractComponent implements OnInit, OnDestroy {
       transaction.set(doc(contractsCol), contract);
     });
   }
-
   async onContractFileSelected(event: Event, contract: Contract & { id?: string }): Promise<void> {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
     let file = input.files[0];
-    // 若為 PDF，先統一尺寸
     if (file.type === 'application/pdf') {
       file = new File([await this.pdfA4Pipe.transform(file)], file.name, { type: 'application/pdf' });
     }
     this.uploadingContractCode = contract.code;
     try {
-      // 1. 上傳到 Storage
       const filePath = `contracts/${contract.code}_${Date.now()}_${file.name}`;
       const storageRef = ref(this.storage, filePath);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
-      // 2. 更新 Firestore 合約文件
       if (contract.id) {
         const contractDoc = firestoreDoc(this.firestore, 'contracts', contract.id);
         await updateDoc(contractDoc, { url });
@@ -331,32 +348,24 @@ export class ContractComponent implements OnInit, OnDestroy {
       input.value = '';
     }
   }
-
   toggleExpand(contract: Contract, event: Event): void {
     event.stopPropagation();
     (contract as any).expanded = !(contract as any).expanded;
   }
-
   editContract(contract: Contract, event: Event): void {
     event.stopPropagation();
-    // TODO: 編輯功能可在此擴充
   }
-
   applyPayment(contract: Contract): void {
     this.showRequest = contract;
   }
-
   closeRequestDialog(): void {
     this.showRequest = null;
   }
-
   onSplitterResizeStart(): void { this.dragging = true; }
   onSplitterResizeEnd(): void { this.dragging = false; }
   onVerticalSplitterResizeStart(): void { this.dragging = true; }
   onVerticalSplitterResizeEnd(): void { this.dragging = false; }
-
   onStepperCreated(data: { orderNo: string; projectNo: string; projectName: string; url: string; contractAmount: number; members: { name: string; role: string }[] }): void {
-    // 建立合約
     const serialDoc = doc(this.firestore, 'meta/contract_serial');
     const contractsCol = collection(this.firestore, 'contracts');
     runTransaction(this.firestore, async (transaction) => {
@@ -375,7 +384,7 @@ export class ContractComponent implements OnInit, OnDestroy {
         orderDate: '',
         projectNo: data.projectNo,
         projectName: data.projectName,
-        contractAmount: data.contractAmount, // 修正這裡
+        contractAmount: data.contractAmount,
         invoicedAmount: 0,
         paymentRound: 1,
         paymentPercent: 0,
@@ -390,7 +399,6 @@ export class ContractComponent implements OnInit, OnDestroy {
     });
     this.showStepper = false;
   }
-
   onPaymentAmountChange(val: number): void {
     this.paymentAmount = val;
     if (this.showRequest && this.showRequest.contractAmount) {
@@ -399,7 +407,6 @@ export class ContractComponent implements OnInit, OnDestroy {
       this.paymentPercent = 0;
     }
   }
-
   onPaymentPercentChange(val: number): void {
     this.paymentPercent = val;
     if (this.showRequest && this.showRequest.contractAmount) {
@@ -408,7 +415,6 @@ export class ContractComponent implements OnInit, OnDestroy {
       this.paymentAmount = 0;
     }
   }
-
   submitPayment(): void {
     if (!this.showRequest || !this.paymentAmount || !this.paymentPercent) return;
     const contract = this.showRequest;
@@ -431,7 +437,6 @@ export class ContractComponent implements OnInit, OnDestroy {
       status: '初始'
     };
     payments.push(record);
-    // Firestore 寫入
     if ((contract as any).id) {
       const contractDoc = firestoreDoc(this.firestore, 'contracts', (contract as any).id);
       updateDoc(contractDoc, { payments });
@@ -441,12 +446,10 @@ export class ContractComponent implements OnInit, OnDestroy {
     this.paymentNote = '';
     this.showRequest = null;
   }
-
   toStatus(contract: Contract, payment: PaymentRecord, status: PaymentRecord['status']): void {
     payment.status = status;
     this.updatePaymentStatusFirestore(contract);
   }
-
   updatePaymentStatusFirestore(contract: Contract): void {
     if ((contract as any).id) {
       const contractDoc = firestoreDoc(this.firestore, 'contracts', (contract as any).id);
@@ -454,11 +457,13 @@ export class ContractComponent implements OnInit, OnDestroy {
     }
   }
 
+  // --------------------
+  // 工具/輔助方法
+  // --------------------
   getInvoicedPercent(contract: Contract): number {
     if (!contract.invoicedAmount || !contract.contractAmount) return 0;
     return Math.round((contract.invoicedAmount / contract.contractAmount) * 100);
   }
-
   getStatusPercent(contract: Contract, status: PaymentRecord['status']): number {
     if (!contract.payments || !contract.contractAmount) return 0;
     const total = contract.payments
@@ -466,7 +471,6 @@ export class ContractComponent implements OnInit, OnDestroy {
       .reduce((sum, p) => sum + (p.amount || 0), 0);
     return Math.round((total / contract.contractAmount) * 100);
   }
-
   getEventLog(contract: Contract): string[] {
     if (!contract.payments) return [];
     return contract.payments.map(p =>
@@ -475,7 +479,6 @@ export class ContractComponent implements OnInit, OnDestroy {
       (p.note ? ` 備註${p.note}` : '')
     );
   }
-
   getEventTimeline(contract: Contract): { label: string; date: string }[] {
     if (!contract.payments) return [];
     return contract.payments.map(p => ({
@@ -485,25 +488,15 @@ export class ContractComponent implements OnInit, OnDestroy {
       date: p.date || ''
     }));
   }
-
   getMessageDate(msg: Message): Date | null {
     if (!msg.createdAt) return null;
-    // Firestore Timestamp 物件
     if (typeof (msg.createdAt as any).toDate === 'function') {
       return (msg.createdAt as any).toDate();
     }
-    // JS Date
     if (msg.createdAt instanceof Date) return msg.createdAt;
     return null;
   }
-
   getNow(): number {
     return Date.now();
-  }
-
-  ngOnDestroy() {
-    if (this.messagesUnsub) this.messagesUnsub();
-    this.destroyed$.next();
-    this.destroyed$.complete();
   }
 } 
