@@ -143,7 +143,25 @@
         </div>
       </ng-template>
       <ng-template #panel [stateKey]="'panel2-bottom'">
-        <!-- 下半部內容（可留空或自訂） -->
+        <div class="message-panel flex flex-col h-full w-full p-2 gap-2">
+          <div class="flex-1 overflow-y-auto message-list">
+            <ng-container *ngIf="loadingMessages">載入中...</ng-container>
+            <ng-container *ngIf="!loadingMessages && messages.length === 0">暫無留言</ng-container>
+            <div *ngFor="let msg of messages" class="message-item p-2 mb-2 rounded shadow-sm" style="background: var(--surface-0); color: var(--text-color);">
+              <div class="text-xs font-bold mb-1">
+                {{ msg.user }}
+                <span class="text-xs text-gray-400">
+                  {{ getMessageDate(msg) ? (getMessageDate(msg) | date:'yyyy/MM/dd HH:mm') : '' }}
+                </span>
+              </div>
+              <div>{{ msg.message }}</div>
+            </div>
+          </div>
+          <form class="flex gap-2 mt-2" (ngSubmit)="sendMessage()">
+            <input pInputText [(ngModel)]="newMessage" name="newMessage" placeholder="輸入留言..." class="flex-1" [disabled]="!selectedContract" />
+            <button pButton type="submit" label="送出" [disabled]="!newMessage.trim() || loadingMessages || !selectedContract"></button>
+          </form>
+        </div>
       </ng-template>
     </p-splitter>
   </ng-template>

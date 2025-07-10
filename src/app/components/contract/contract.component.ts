@@ -1,5 +1,5 @@
 // 本檔案依據 Firebase Console 專案設定，使用 Firebase Client SDK 操作 Cloud Firestore。
-import { Component, inject, OnDestroy } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ToastModule } from 'primeng/toast';
@@ -9,13 +9,15 @@ import { Subject, Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { PrimeNgModule } from '../../shared/modules/prime-ng.module';
 import { FormsModule } from '@angular/forms';
-import { Firestore, collection, addDoc, doc, runTransaction, collectionData, DocumentData, doc as firestoreDoc, updateDoc } from '@angular/fire/firestore';
+import { Firestore, collection, doc, runTransaction, collectionData, DocumentData, doc as firestoreDoc, updateDoc } from '@angular/fire/firestore';
 import { Storage, getDownloadURL, ref, uploadBytes } from '@angular/fire/storage';
 import { PdfA4Pipe } from '../../shared/pipes/pdf-a4.pipe';
 import { TimelineModule } from 'primeng/timeline';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { StepButtonComponent } from './stepbutton/create/create.component';
 import { OrganizationChartModule } from 'primeng/organizationchart';
+// 只保留 @angular/fire/firestore 的 import，移除重複
+import { collection as firestoreCollection, query, where, orderBy, onSnapshot, addDoc, deleteDoc, serverTimestamp, getDocs, Timestamp, QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 
 export interface PaymentRecord {
   round: number;
@@ -47,6 +49,14 @@ export interface Contract {
   members?: { name: string; role: string }[];
 }
 
+interface Message {
+  id?: string;
+  contractId: string;
+  user: string;
+  message: string;
+  createdAt: Date | Timestamp;
+}
+
 @Component({
   selector: 'app-contract',
   standalone: true,
@@ -54,7 +64,7 @@ export interface Contract {
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
-export class ContractComponent implements OnDestroy {
+export class ContractComponent implements OnInit, OnDestroy {
   user: any = null; // 明確型別
   loading = true;
   private destroyed$ = new Subject<void>();
@@ -112,6 +122,11 @@ export class ContractComponent implements OnDestroy {
     };
   }
 
+  messages: Message[] = [];
+  newMessage = '';
+  loadingMessages = false;
+  private messagesUnsub: (() => void) | null = null;
+
   constructor() {
     inject(AuthService).user$
       .pipe(takeUntil(this.destroyed$))
@@ -134,6 +149,46 @@ export class ContractComponent implements OnDestroy {
     const contractsCol = collection(this.firestore, 'contracts');
     this.firestoreContracts$ = collectionData(contractsCol, { idField: 'id' }) as Observable<Contract[] | null>;
     this.firestoreContracts$.pipe(takeUntil(this.destroyed$)).subscribe(data => { this._contracts = data; });
+    // this.listenMessages(); // <-- 移除這行，改用 ngOnInit
+  }
+
+  ngOnInit(): void {
+    this.listenMessages();
+  }
+
+  listenMessages(): void {
+    if (this.messagesUnsub) this.messagesUnsub();
+    if (!this.selectedContract) return;
+    this.loadingMessages = true;
+    const messagesCol = firestoreCollection(this.firestore, 'messages');
+    const q = query(messagesCol, where('contractId', '==', this.selectedContract.code), orderBy('createdAt', 'desc'));
+    this.messagesUnsub = onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
+      this.messages = snap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() } as Message));
+      this.loadingMessages = false;
+    });
+  }
+
+  async sendMessage(): Promise<void> {
+    if (!this.newMessage.trim() || !this.selectedContract) return;
+    const messagesCol = firestoreCollection(this.firestore, 'messages');
+    await addDoc(messagesCol, {
+      contractId: this.selectedContract.code,
+      user: this.user?.displayName || '匿名',
+      message: this.newMessage.trim(),
+      createdAt: serverTimestamp(),
+      expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24小時後
+    });
+    this.newMessage = '';
+  }
+
+  async removeExpiredMessages(): Promise<void> {
+    // 可定時呼叫，或用雲端函數自動清理
+    const messagesCol = firestoreCollection(this.firestore, 'messages');
+    const q = query(messagesCol, where('expireAt', '<=', new Date()));
+    const snap = await getDocs(q);
+    for (const doc of snap.docs) {
+      await deleteDoc(doc.ref);
+    }
   }
 
   isPdfUrl(url: string): boolean {
@@ -145,12 +200,14 @@ export class ContractComponent implements OnDestroy {
     if (event.data) {
       this.selectedContract = event.data as Contract;
       this.updateSafeUrl();
+      this.listenMessages(); // 每次選合約時都要重新監聽留言
     }
   }
 
   selectContract(contract: Contract): void {
     this.selectedContract = contract;
     this.updateSafeUrl();
+    this.listenMessages(); // 每次選合約時都要重新監聽留言
   }
 
   updateSafeUrl(): void {
@@ -376,7 +433,19 @@ export class ContractComponent implements OnDestroy {
     }));
   }
 
+  getMessageDate(msg: Message): Date | null {
+    if (!msg.createdAt) return null;
+    // Firestore Timestamp 物件
+    if (typeof (msg.createdAt as any).toDate === 'function') {
+      return (msg.createdAt as any).toDate();
+    }
+    // JS Date
+    if (msg.createdAt instanceof Date) return msg.createdAt;
+    return null;
+  }
+
   ngOnDestroy() {
+    if (this.messagesUnsub) this.messagesUnsub();
     this.destroyed$.next();
     this.destroyed$.complete();
   }
