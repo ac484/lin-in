@@ -1,9 +1,0 @@
-<div class="contract-list">
-  <h2>合約列表</h2>
-  <ul>
-    <li *ngFor="let c of contracts$ | async">
-      <strong>{{c.code}}</strong> - {{c.projectName}} - 金額：{{c.contractAmount | number}}
-    </li>
-  </ul>
-</div>
-
