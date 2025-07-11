@@ -50,12 +50,12 @@
               <td>
                 {{ getDaysSinceCreation(contract) }} 天
               </td>
-              <td>
+              <td [style.color]="getInfoBgColor(contract)">
                 <div>{{ contract.orderNo }}</div>
                 <div>{{ contract.projectNo }}</div>
                 <div>{{ contract.projectName }}</div>
               </td>
-              <td class="flex flex-col">
+              <td class="flex flex-col" [style.color]="getAmountBgColor(contract)">
                 <div>原始: {{ getOriginalAmount(contract) | number:'1.0-2' }}</div>
                 <div>變更: {{ getNetChange(contract) | number:'1.0-2' }}</div>
                 <div>現行: {{ contract.contractAmount | number:'1.0-2' }}</div>

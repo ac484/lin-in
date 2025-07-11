@@ -491,4 +491,48 @@ export class ContractComponent implements OnInit, OnDestroy {
     }
     return '';
   }
+  // 合約資訊根據進行中次數對應背景色 (10色)
+  readonly inProgressBgColors: string[] = [
+    'hsl(120, 60%, 90%)',
+    'hsl(120, 60%, 80%)',
+    'hsl(120, 60%, 70%)',
+    'hsl(120, 60%, 60%)',
+    'hsl(120, 60%, 50%)',
+    'hsl(120, 60%, 40%)',
+    'hsl(120, 60%, 30%)',
+    'hsl(120, 60%, 25%)',
+    'hsl(120, 60%, 20%)',
+    'hsl(120, 60%, 15%)'
+  ];
+  // 合約金額根據變更次數對應背景色 (10色)
+  readonly changeBgColors: string[] = [
+    'hsl(0, 60%, 90%)',
+    'hsl(0, 60%, 80%)',
+    'hsl(0, 60%, 70%)',
+    'hsl(0, 60%, 60%)',
+    'hsl(0, 60%, 50%)',
+    'hsl(0, 60%, 40%)',
+    'hsl(0, 60%, 30%)',
+    'hsl(0, 60%, 25%)',
+    'hsl(0, 60%, 20%)',
+    'hsl(0, 60%, 15%)'
+  ];
+  /**
+   * 根據 contract 中進行中數量回傳背景色
+   */
+  getInfoBgColor(contract: Contract): string {
+    const cnt = this.getProgressSummary(contract).inProgress.count;
+    if (cnt <= 0) return '';
+    const idx = Math.min(this.inProgressBgColors.length - 1, cnt - 1);
+    return this.inProgressBgColors[idx];
+  }
+  /**
+   * 根據 contract 變更次數回傳金額欄背景色
+   */
+  getAmountBgColor(contract: Contract): string {
+    const cnt = contract.changes ? contract.changes.length : 0;
+    if (cnt <= 0) return '';
+    const idx = Math.min(this.changeBgColors.length - 1, cnt - 1);
+    return this.changeBgColors[idx];
+  }
 } 
