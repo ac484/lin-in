@@ -25,13 +25,13 @@ import { collection as firestoreCollection, query, where, orderBy, onSnapshot, a
 import { Injector, runInInjectionContext } from '@angular/core';
 
 export interface PaymentRecord {
-  round: number;
-  date: string;
-  amount: number;
-  percent: number;
-  applicant: string;
-  note?: string;
-  status?: '初始' | '申請中' | '審核中' | '開票中' | '放款中' | '完成' | '已拒絕';
+  round: number; // 請款輪次
+  status?: '初始' | '申請中' | '審核中' | '開票中' | '放款中' | '完成' | '已拒絕'; // 請款狀態
+  percent: number; // 請款百分比
+  amount: number; // 請款金額
+  applicant: string; // 請款人
+  date: string; // 請款日期
+  note?: string; // 備註
 }
 
 export interface Contract {

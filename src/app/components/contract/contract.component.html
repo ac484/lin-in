@@ -89,30 +89,32 @@
                 <ng-container *ngIf="contract.payments?.length; else noPayments">
                   <div *ngFor="let p of contract.payments" class="flex gap-4 items-center border-b pb-1">
                     <span>第{{ p.round }}次</span>
-                    <span>{{ p.date | date:'yyyy/MM/dd HH:mm' }}</span>
+                    <span>{{ p.status || '未知' }}</span>
+                    <span>{{ p.percent }}%</span>
                     <span>金額：{{ p.amount | number:'1.0-0' }}</span>
-                    <span>百分比：{{ p.percent }}%</span>
-                    <span>申請人：{{ p.applicant }}</span>
+                    <span>{{ p.applicant }}</span>
+                    <span>{{ p.date | date:'yyyy/MM/dd HH:mm' }}</span>
                     <span *ngIf="p.note">備註：{{ p.note }}</span>
-                    <span>狀態：{{ p.status || '未知' }}</span>
                     <!-- 狀態操作按鈕群 -->
-                    <ng-container *ngIf="p.status === '初始'">
-                      <button pButton type="button" label="送出申請" icon="pi pi-send" class="p-button-sm ml-2" (click)="toStatus(contract, p, '申請中')"></button>
-                    </ng-container>
-                    <ng-container *ngIf="p.status === '申請中'">
-                      <button pButton type="button" label="送審" icon="pi pi-check-square" class="p-button-sm ml-2" (click)="toStatus(contract, p, '審核中')"></button>
-                      <button pButton type="button" label="拒絕" icon="pi pi-times-circle" class="p-button-sm ml-2 p-button-danger" (click)="toStatus(contract, p, '已拒絕')"></button>
-                    </ng-container>
-                    <ng-container *ngIf="p.status === '審核中'">
-                      <button pButton type="button" label="開票" icon="pi pi-file-invoice" class="p-button-sm ml-2" (click)="toStatus(contract, p, '開票中')"></button>
-                      <button pButton type="button" label="拒絕" icon="pi pi-times-circle" class="p-button-sm ml-2 p-button-danger" (click)="toStatus(contract, p, '已拒絕')"></button>
-                    </ng-container>
-                    <ng-container *ngIf="p.status === '開票中'">
-                      <button pButton type="button" label="放款" icon="pi pi-credit-card" class="p-button-sm ml-2" (click)="toStatus(contract, p, '放款中')"></button>
-                    </ng-container>
-                    <ng-container *ngIf="p.status === '放款中'">
-                      <button pButton type="button" label="完成" icon="pi pi-check" class="p-button-sm ml-2" (click)="toStatus(contract, p, '完成')"></button>
-                    </ng-container>
+                    <span class="action-col">
+                      <ng-container *ngIf="p.status === '初始'">
+                        <button pButton type="button" label="送出申請" icon="pi pi-send" class="p-button-sm mb-1" (click)="toStatus(contract, p, '申請中')"></button>
+                      </ng-container>
+                      <ng-container *ngIf="p.status === '申請中'">
+                        <button pButton type="button" label="送審" icon="pi pi-check-square" class="p-button-sm mb-1" (click)="toStatus(contract, p, '審核中')"></button>
+                        <button pButton type="button" label="拒絕" icon="pi pi-times-circle" class="p-button-sm p-button-danger" (click)="toStatus(contract, p, '已拒絕')"></button>
+                      </ng-container>
+                      <ng-container *ngIf="p.status === '審核中'">
+                        <button pButton type="button" label="開票" icon="pi pi-file-invoice" class="p-button-sm mb-1" (click)="toStatus(contract, p, '開票中')"></button>
+                        <button pButton type="button" label="拒絕" icon="pi pi-times-circle" class="p-button-sm p-button-danger" (click)="toStatus(contract, p, '已拒絕')"></button>
+                      </ng-container>
+                      <ng-container *ngIf="p.status === '開票中'">
+                        <button pButton type="button" label="放款" icon="pi pi-credit-card" class="p-button-sm mb-1" (click)="toStatus(contract, p, '放款中')"></button>
+                      </ng-container>
+                      <ng-container *ngIf="p.status === '放款中'">
+                        <button pButton type="button" label="完成" icon="pi pi-check" class="p-button-sm mb-1" (click)="toStatus(contract, p, '完成')"></button>
+                      </ng-container>
+                    </span>
                   </div>
                 </ng-container>
                 <ng-template #noPayments>

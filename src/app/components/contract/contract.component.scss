@@ -57,3 +57,10 @@
 }
 .w-100px { width: 100px !important; }
 // 進度條、按鈕等元件已自動跟隨 PrimeNG 主題
+
+.action-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+}
