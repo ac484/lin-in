@@ -167,6 +167,48 @@ export class ContractComponent implements OnInit, OnDestroy {
   readonly statusList: PaymentRecord['status'][] = ['初始','申請中','審核中','開票中','放款中','完成'];
 
   // --------------------
+  // 顏色常數 (集中管理)
+  // 月亮灰色階 (11色)
+  readonly moonGrayScale: string[] = [
+    'hsl(0, 0%, 98%)',
+    'hsl(0, 0%, 95%)',
+    'hsl(0, 0%, 90%)',
+    'hsl(0, 0%, 85%)',
+    'hsl(0, 0%, 80%)',
+    'hsl(0, 0%, 75%)',
+    'hsl(0, 0%, 70%)',
+    'hsl(0, 0%, 65%)',
+    'hsl(0, 0%, 60%)',
+    'hsl(0, 0%, 55%)',
+    'hsl(0, 0%, 50%)'
+  ];
+  // 綠色階 (進行中次數警示)
+  readonly inProgressBgColors: string[] = [
+    'hsl(120, 60%, 90%)',
+    'hsl(120, 60%, 80%)',
+    'hsl(120, 60%, 70%)',
+    'hsl(120, 60%, 60%)',
+    'hsl(120, 60%, 50%)',
+    'hsl(120, 60%, 40%)',
+    'hsl(120, 60%, 30%)',
+    'hsl(120, 60%, 25%)',
+    'hsl(120, 60%, 20%)',
+    'hsl(120, 60%, 15%)'
+  ];
+  // 紅色階 (變更次數警示)
+  readonly changeBgColors: string[] = [
+    'hsl(0, 60%, 90%)',
+    'hsl(0, 60%, 80%)',
+    'hsl(0, 60%, 70%)',
+    'hsl(0, 60%, 60%)',
+    'hsl(0, 60%, 50%)',
+    'hsl(0, 60%, 40%)',
+    'hsl(0, 60%, 30%)',
+    'hsl(0, 60%, 25%)',
+    'hsl(0, 60%, 20%)',
+    'hsl(0, 60%, 15%)'
+  ];
+  // --------------------
   // Getter
   // --------------------
   get contracts(): Contract[] {
@@ -486,37 +528,11 @@ export class ContractComponent implements OnInit, OnDestroy {
    */
   getTagBackground(label: string): string {
     if (label === '進行中') {
-      // 淡紫灰色
-      return 'hsl(250, 20%, 80%)';
+      // 使用月亮灰階中值
+      return this.moonGrayScale[5];
     }
     return '';
   }
-  // 合約資訊根據進行中次數對應背景色 (10色)
-  readonly inProgressBgColors: string[] = [
-    'hsl(120, 60%, 90%)',
-    'hsl(120, 60%, 80%)',
-    'hsl(120, 60%, 70%)',
-    'hsl(120, 60%, 60%)',
-    'hsl(120, 60%, 50%)',
-    'hsl(120, 60%, 40%)',
-    'hsl(120, 60%, 30%)',
-    'hsl(120, 60%, 25%)',
-    'hsl(120, 60%, 20%)',
-    'hsl(120, 60%, 15%)'
-  ];
-  // 合約金額根據變更次數對應背景色 (10色)
-  readonly changeBgColors: string[] = [
-    'hsl(0, 60%, 90%)',
-    'hsl(0, 60%, 80%)',
-    'hsl(0, 60%, 70%)',
-    'hsl(0, 60%, 60%)',
-    'hsl(0, 60%, 50%)',
-    'hsl(0, 60%, 40%)',
-    'hsl(0, 60%, 30%)',
-    'hsl(0, 60%, 25%)',
-    'hsl(0, 60%, 20%)',
-    'hsl(0, 60%, 15%)'
-  ];
   /**
    * 根據 contract 中進行中數量回傳背景色
    */
