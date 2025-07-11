@@ -1,49 +1,75 @@
 // 本檔案依據 Firebase Console 專案設定，使用 Firebase Client SDK 操作 Cloud Firestore。
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
 import { OrganizationChartModule } from 'primeng/organizationchart';
 import type { Contract } from '../../contract.component';
+import { TreeNode } from 'primeng/api';
 
 @Component({
   selector: 'app-organizational',
   standalone: true,
-  imports: [CommonModule, OrganizationChartModule],
+  imports: [CommonModule, FormsModule, InputTextModule, ButtonModule, OrganizationChartModule],
   templateUrl: './organizational.component.html',
   styleUrls: ['./organizational.component.scss']
 })
-export class OrganizationalComponent {
+export class OrganizationalComponent implements OnChanges {
   @Input() contract: Contract | null = null;
-  @Input() defaultLabel: string = '專案團隊';
+  chartData: TreeNode[] = [];
 
-  getOrgChartData(contract: Contract | null): any {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['contract']) {
+      this.chartData = [this.getOrgChartData(this.contract)];
+    }
+  }
+
+  getOrgChartData(contract: Contract | null): TreeNode {
+    const defaultLabel = '專案團隊';
     if (!contract) return this.getDefaultOrgChartData();
-    return {
-      label: contract.projectName || this.defaultLabel,
+    const members = contract.members?.length ? contract.members : Array(3).fill({ name: '', role: '' });
+    const children: TreeNode[] = members.map(m => ({
+      label: m.name || '—',
+      type: 'person',
       expanded: true,
-      children: (contract.members && contract.members.length > 0
-        ? contract.members
-        : [
-            { name: '', role: '' },
-            { name: '', role: '' },
-            { name: '', role: '' }
-          ]
-      ).map(m => ({
-        label: m.role || '角色',
+      data: { ...m }
+    }));
+    return {
+      label: contract.projectName || defaultLabel,
+      type: 'person',
+      expanded: true,
+      data: { name: contract.projectName, role: '' },
+      children
+    };
+  }
+
+  getDefaultOrgChartData(): TreeNode {
+    return {
+      label: '專案團隊',
+      expanded: true,
+      children: Array(3).fill(null).map(() => ({
+        label: '—',
         type: 'person',
-        data: m
+        expanded: true,
+        data: { name: '', role: '' }
       }))
     };
   }
 
-  getDefaultOrgChartData(): any {
-    return {
-      label: this.defaultLabel,
-      expanded: true,
-      children: [
-        { label: '角色', type: 'person', data: { name: '', role: '' }, expanded: true },
-        { label: '角色', type: 'person', data: { name: '', role: '' }, expanded: true },
-        { label: '角色', type: 'person', data: { name: '', role: '' }, expanded: true }
-      ]
-    };
+  startEdit(node: TreeNode): void {
+    node.data._backup = { ...node.data };
+    node.data.editing = true;
+  }
+
+  saveEdit(node: TreeNode): void {
+    delete node.data._backup;
+    node.data.editing = false;
+  }
+
+  cancelEdit(node: TreeNode): void {
+    Object.assign(node.data, node.data._backup);
+    delete node.data._backup;
+    node.data.editing = false;
   }
 }
