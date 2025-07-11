@@ -212,7 +212,17 @@ export class ContractComponent implements OnInit, OnDestroy {
   // Getter
   // --------------------
   get contracts(): Contract[] {
-    return (this._contracts ?? []).slice().sort((a, b) => parseInt(a.code.replace('C-', ''), 10) - parseInt(b.code.replace('C-', ''), 10));
+    return (this._contracts ?? [])
+      .filter(contract => !this.isContractCompleted(contract))
+      .slice()
+      .sort((a, b) => parseInt(a.code.replace('C-', ''), 10) - parseInt(b.code.replace('C-', ''), 10));
+  }
+
+  get completedContracts(): Contract[] {
+    return (this._contracts ?? [])
+      .filter(contract => this.isContractCompleted(contract))
+      .slice()
+      .sort((a, b) => parseInt(a.code.replace('C-', ''), 10) - parseInt(b.code.replace('C-', ''), 10));
   }
 
   // --------------------
@@ -352,6 +362,10 @@ export class ContractComponent implements OnInit, OnDestroy {
   // --------------------
   // 工具/輔助方法
   // --------------------
+  isContractCompleted(contract: Contract): boolean {
+    const summary = this.getProgressSummary(contract);
+    return summary.completed.percent === 100;
+  }
   getProgressSummary(contract: Contract): {notStarted: {count: number, percent: number}, inProgress: {count: number, percent: number}, completed: {count: number, percent: number}} {
     if (!contract.payments || contract.payments.length === 0) {
       return {

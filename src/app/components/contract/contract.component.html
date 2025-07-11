@@ -9,15 +9,16 @@
   >
   
   <!-- =====================
-    Panel 1: 左側（合約列表 + 組織圖）
+    Panel 1: 左側（合約列表 + 已完成區域）
   ====================== -->
   <ng-template #panel>
-    <div class="overflow-x-auto w-full h-full">
-      <div class="flex flex-col items-center justify-start h-full gap-2 min-h-0">
-        <!-- 組織圖 -->
-        <app-organizational [contract]="selectedContract"></app-organizational>
-        <!-- 合約列表 Table 滾動面板 -->
-        <p-scrollPanel class="flex-1 w-full min-h-0">
+    <p-splitter [stateKey]="'panel1'" layout="vertical" [panelSizes]="[85, 15]">
+      <!-- 上：進行中合約 -->
+      <ng-template #panel [stateKey]="'panel1-top'">
+        <div class="overflow-x-auto w-full h-full">
+          <div class="flex flex-col justify-start h-full gap-2 min-h-0">
+            <!-- 合約列表 Table 滾動面板 -->
+            <p-scrollPanel class="flex-1 w-full min-h-0">
           <p-table
             [value]="contracts"
             styleClass="p-datatable-sm"
@@ -177,8 +178,60 @@
         <p-dialog [(visible)]="showStepper" [modal]="true" [closable]="true" [dismissableMask]="true" [style]="{width: '480px'}" header="建立合約" (onHide)="showStepper = false">
           <app-stepbutton (contractCreated)="onStepperCreated($event)"></app-stepbutton>
         </p-dialog>
-      </div>
-    </div>
+          </div>
+        </div>
+      </ng-template>
+      
+      <!-- 下：已完成合約與備忘錄 -->
+      <ng-template #panel [stateKey]="'panel1-bottom'">
+        <p-splitter [stateKey]="'panel1-footer'" layout="horizontal" [panelSizes]="[25, 75]">
+          <!-- 左：已完成合約 -->
+          <ng-template #panel [stateKey]="'panel1-footer-left'">
+            <div class="w-full h-full">
+              <div class="flex flex-col h-full min-h-0">
+                <div class="text-xs font-medium text-gray-600 px-1 py-1">已完成</div>
+                <p-scrollPanel class="flex-1 w-full min-h-0">
+                  <p-table
+                    [value]="completedContracts"
+                    styleClass="p-datatable-sm compact-table"
+                    [tableStyle]="{ 'font-size': '10px', 'width': '100%' }"
+                    [responsiveLayout]="'scroll'"
+                    selectionMode="single"
+                    [(selection)]="selectedContract"
+                    dataKey="code"
+                    [rowHover]="true"
+                    (onRowSelect)="onRowSelect($event)">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th style="width: 20%">編號</th>
+                        <th style="width: 55%">專案</th>
+                        <th style="width: 25%">金額</th>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-contract let-rowIndex="rowIndex">
+                      <tr [pSelectableRow]="contract" [pSelectableRowIndex]="rowIndex"
+                        [class.bg-blue-50]="selectedContract?.code === contract.code"
+                        (click)="selectContract(contract)">
+                        <td>{{ contract.code }}</td>
+                        <td>{{ contract.projectName }}</td>
+                        <td>{{ contract.contractAmount | number:'1.0-0' }}</td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                </p-scrollPanel>
+              </div>
+            </div>
+          </ng-template>
+          
+          <!-- 右：備忘錄 -->
+          <ng-template #panel [stateKey]="'panel1-footer-right'">
+            <p-scrollPanel style="width:100%; height:100%;">
+              <app-messages [contract]="selectedContract" [user]="user"></app-messages>
+            </p-scrollPanel>
+          </ng-template>
+        </p-splitter>
+      </ng-template>
+    </p-splitter>
   </ng-template>
 
   <!-- =====================
@@ -192,9 +245,13 @@
           <app-docsviewer [src]="selectedContract?.url ?? null"></app-docsviewer>
         </p-scrollPanel>
       </ng-template>
-      <!-- 下：備忘錄區 -->
+      <!-- 下：組織圖區 -->
       <ng-template #panel [stateKey]="'panel2-bottom'">
-        <app-messages [contract]="selectedContract" [user]="user"></app-messages>
+        <p-scrollPanel style="width:100%; height:100%;">
+          <div class="w-full h-full flex items-center justify-center">
+            <app-organizational [contract]="selectedContract"></app-organizational>
+          </div>
+        </p-scrollPanel>
       </ng-template>
     </p-splitter>
   </ng-template>
@@ -203,24 +260,28 @@
     Panel 3: 右側（歷程/事件紀錄）
   ====================== -->
   <ng-template #panel [stateKey]="'panel3'">
-    <div class="flex flex-col justify-between h-full w-full">
-      <!-- 歷程 Timeline -->
-      <p-scrollPanel style="width:100%; height:70%;" *ngIf="selectedContract">
-        <p-timeline [value]="getEventTimeline(selectedContract)" align="alternate">
-          <ng-template pTemplate="content" let-item>
-            <div>
-              <div>{{ item.label }}</div>
-              <div class="text-xs text-gray-500">{{ item.date | date:'yyyy/MM/dd HH:mm' }}</div>
-            </div>
-          </ng-template>
-        </p-timeline>
-      </p-scrollPanel>
-      <div *ngIf="!selectedContract" class="text-gray-500">請選擇合約以檢視歷程</div>
-      <p-scrollPanel style="width:100%; height:200px;" *ngIf="selectedContract">
-        <div class="font-bold mb-2">事件紀錄</div>
-        <div *ngFor="let log of getEventLog(selectedContract)" class="text-xs mb-1">{{ log }}</div>
-      </p-scrollPanel>
-    </div>
+    <p-scrollPanel style="width:100%; height:100%;">
+      <div class="flex flex-col justify-between h-full w-full p-2">
+        <!-- 歷程 Timeline -->
+        <div class="flex-1 mb-4" *ngIf="selectedContract">
+          <p-timeline [value]="getEventTimeline(selectedContract)" align="alternate">
+            <ng-template pTemplate="content" let-item>
+              <div>
+                <div>{{ item.label }}</div>
+                <div class="text-xs text-gray-500">{{ item.date | date:'yyyy/MM/dd HH:mm' }}</div>
+              </div>
+            </ng-template>
+          </p-timeline>
+        </div>
+        <div *ngIf="!selectedContract" class="text-gray-500 p-4">請選擇合約以檢視歷程</div>
+        
+        <!-- 事件紀錄 -->
+        <div class="border-t pt-2" *ngIf="selectedContract">
+          <div class="font-bold mb-2 text-sm">事件紀錄</div>
+          <div *ngFor="let log of getEventLog(selectedContract)" class="text-xs mb-1">{{ log }}</div>
+        </div>
+      </div>
+    </p-scrollPanel>
   </ng-template>
 </p-splitter>
 
