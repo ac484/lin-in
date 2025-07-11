@@ -458,4 +458,37 @@ export class ContractComponent implements OnInit, OnDestroy {
     const hue = p * 1.2; // 0~120
     return `hsl(${hue}, 100%, 40%)`;
   }
+  /**
+   * 根據標籤回傳百分比顏色，'未開始' 使用反轉漸變
+   */
+  getPercentColorByLabel(label: string, percent: number): string {
+    const p = Math.min(100, Math.max(0, percent));
+    if (label === '未開始') {
+      // 反向漸變: 0%綠->100%紅
+      const hue = 120 - (p * 1.2);
+      return `hsl(${hue}, 100%, 40%)`;
+    }
+    if (label === '進行中') {
+      // 月亮灰 (無飽和度) -> 月亮紫
+      const start = { h: 0, s: 0, l: 70 };
+      const end = { h: 280, s: 50, l: 60 };
+      const hue = start.h + ((end.h - start.h) * p) / 100;
+      const sat = start.s + ((end.s - start.s) * p) / 100;
+      const lum = start.l + ((end.l - start.l) * p) / 100;
+      return `hsl(${hue.toFixed(1)}, ${sat.toFixed(1)}%, ${lum.toFixed(1)}%)`;
+    }
+    // 其餘使用一般紅-綠漸變
+    return this.getPercentColor(percent);
+  }
+ 
+  /**
+   * 根據標籤回傳 Tag 背景色，'進行中' 使用月亮色系
+   */
+  getTagBackground(label: string): string {
+    if (label === '進行中') {
+      // 淡紫灰色
+      return 'hsl(250, 20%, 80%)';
+    }
+    return '';
+  }
 } 

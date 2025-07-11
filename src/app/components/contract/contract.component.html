@@ -68,8 +68,13 @@
                     {label: '已完成', data: getProgressSummary(contract).completed}
                   ]">
                     <div *ngIf="item.data.percent > 0" class="flex items-center gap-2">
-                      <p-tag [value]="item.label + ' (' + item.data.count + ')'" [severity]="getStatusSeverity(item.label)"></p-tag>
-                      <span class="text-xs" [style.color]="getPercentColor(item.data.percent)">{{ item.data.percent }}%</span>
+                      <p-tag 
+                        [value]="item.label + ' (' + item.data.count + ')'" 
+                        [severity]="getStatusSeverity(item.label)"
+                        [style.backgroundColor]="getTagBackground(item.label)"
+                        [style.color]="item.label==='進行中' ? '#333' : null">
+                      </p-tag>
+                      <span class="text-xs" [style.color]="getPercentColorByLabel(item.label, item.data.percent)">{{ item.data.percent }}%</span>
                     </div>
                   </ng-container>
                 </div>
