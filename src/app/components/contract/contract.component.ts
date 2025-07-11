@@ -42,14 +42,14 @@ export interface Contract {
   projectNo: string;
   projectName: string;
   contractAmount: number;
+  pendingPercent: number;
   invoicedAmount: number;
   paymentRound: number;
   paymentPercent: number;
   paymentStatus: string;
   invoiceStatus: string;
-  pendingPercent: number;
   note: string;
-  url: string; // 檔案下載連結
+  url: string;
   payments?: PaymentRecord[];
   members?: { name: string; role: string }[];
 }
