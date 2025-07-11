@@ -5,6 +5,12 @@ import { Firestore, doc as firestoreDoc, updateDoc } from '@angular/fire/firesto
 import type { Contract, PaymentRecord } from '../../contract.component';
 import { DialogModule } from 'primeng/dialog';
 
+// Add a minimal user info interface
+interface UserInfo {
+  displayName?: string;
+  email?: string;
+}
+
 @Component({
   selector: 'app-request',
   standalone: true,
@@ -14,7 +20,7 @@ import { DialogModule } from 'primeng/dialog';
 })
 export class RequestComponent {
   @Input() contract: Contract | null = null;
-  @Input() user: any = null;
+  @Input() user: UserInfo | string | null = null;
   @Output() completed = new EventEmitter<void>();
   visible = false;
   paymentAmount: number | null = null;
@@ -22,7 +28,7 @@ export class RequestComponent {
   paymentNote = '';
   private firestore = inject(Firestore);
 
-  open(contract: Contract, user: any) {
+  open(contract: Contract, user: UserInfo | string): void {
     this.contract = contract;
     this.user = user;
     this.visible = true;
@@ -49,31 +55,34 @@ export class RequestComponent {
       this.paymentAmount = 0;
     }
   }
-  submitPayment(): void {
-    if (!this.contract || !this.paymentAmount || !this.paymentPercent) return;
+  async submitPayment(): Promise<void> {
+    if (!this.contract || this.paymentAmount === null || this.paymentPercent === null) {
+      return;
+    }
     const contract = this.contract;
     const payments = Array.isArray(contract.payments) ? contract.payments : [];
     const newRound = payments.length + 1;
     let applicant = '未知';
     const user = this.user;
-    if (user && typeof user === 'object') {
-      applicant = (user.displayName || user.email || '未知');
+    if (user != null && typeof user === 'object') {
+      applicant = user.displayName ?? user.email ?? '未知';
     } else if (typeof user === 'string') {
       applicant = user;
     }
     const record: PaymentRecord = {
       round: newRound,
       date: new Date().toISOString(),
-      amount: this.paymentAmount!,
-      percent: this.paymentPercent!,
+      amount: this.paymentAmount,
+      percent: this.paymentPercent,
       applicant,
       note: this.paymentNote,
       status: '初始'
     };
     payments.push(record);
-    if ((contract as any).id) {
-      const contractDoc = firestoreDoc(this.firestore, 'contracts', (contract as any).id);
-      updateDoc(contractDoc, { payments });
+    const id = (contract as any).id;
+    if (id) {
+      const contractDoc = firestoreDoc(this.firestore, 'contracts', id);
+      await updateDoc(contractDoc, { payments });
     }
     this.paymentAmount = null;
     this.paymentPercent = null;

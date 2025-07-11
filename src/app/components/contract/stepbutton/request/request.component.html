@@ -1,16 +1,21 @@
-<p-dialog [visible]="visible" [modal]="true" [closable]="true" header="申請請款" [style]="{width: '400px'}" (onHide)="close()">
-  <form *ngIf="contract" (ngSubmit)="submitPayment()" class="flex flex-col gap-4">
-    <div class="flex gap-4">
-      <label>申請金額
-        <input pInputText type="number" [(ngModel)]="paymentAmount" name="paymentAmount" required (ngModelChange)="onPaymentAmountChange($event)" />
+<p-dialog [(visible)]="visible" [modal]="true" [closable]="true" header="申請請款" [style]="{width: '400px'}">
+  <div *ngIf="contract" class="request-container">
+    <form (ngSubmit)="submitPayment()" class="flex flex-col gap-4">
+      <div class="flex gap-4">
+        <label>申請金額
+          <input pInputText type="number" [(ngModel)]="paymentAmount" name="paymentAmount" required (ngModelChange)="onPaymentAmountChange($event)" />
+        </label>
+        <label>百分比
+          <input pInputText type="number" [(ngModel)]="paymentPercent" name="paymentPercent" required min="0" max="100" (ngModelChange)="onPaymentPercentChange($event)" />
+        </label>
+      </div>
+      <label>備註
+        <input pInputText [(ngModel)]="paymentNote" name="paymentNote" />
       </label>
-      <label>百分比
-        <input pInputText type="number" [(ngModel)]="paymentPercent" name="paymentPercent" required min="0" max="100" (ngModelChange)="onPaymentPercentChange($event)" />
-      </label>
-    </div>
-    <label>備註
-      <input pInputText [(ngModel)]="paymentNote" name="paymentNote" />
-    </label>
-    <button pButton type="submit" label="送出" [disabled]="!paymentAmount || !paymentPercent"></button>
-  </form>
+      <div class="flex justify-end gap-2 mt-4">
+        <button pButton type="button" class="p-button-text" (click)="close()">取消</button>
+        <button pButton type="submit" [disabled]="!paymentAmount || !paymentPercent">送出</button>
+      </div>
+    </form>
+  </div>
 </p-dialog>
