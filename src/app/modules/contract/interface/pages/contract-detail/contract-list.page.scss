@@ -1,0 +1,145 @@
+:host {
+  font-family: inherit;
+  color: var(--text-color);
+  font-size: 1rem;
+  display: block;
+  height: 100%;
+}
+:host ::ng-deep .p-splitter {
+  width: 100%;
+  height: 100%;
+}
+:host ::ng-deep .p-datatable {
+  .p-datatable-tbody > tr {
+    transition: background-color 0.15s;
+    &:hover { background-color: var(--surface-hover) !important; }
+    &.p-highlight { background-color: var(--primary-50) !important; }
+    td { padding: 0.5rem !important; border-bottom: 1px solid var(--surface-border); }
+  }
+  .p-datatable-thead > tr > th {
+    padding: 0.5rem !important;
+    font-weight: 600;
+    border-bottom: 2px solid var(--surface-border);
+    color: var(--text-color);
+  }
+}
+
+// 進度摘要樣式
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 0.5rem; }
+.text-sm { font-size: 0.875rem; }
+.text-xs { font-size: 0.75rem; }
+.w-16 { width: 4rem; }
+.h-2 { height: 0.5rem; }
+.bg-gray-200 { background-color: #e5e7eb; }
+.bg-blue-500 { background-color: #3b82f6; }
+.rounded-full { border-radius: 9999px; }
+.overflow-hidden { overflow: hidden; }
+.transition-all { transition: all 0.3s ease; }
+.duration-300 { transition-duration: 300ms; }
+
+// 原有樣式保持不變
+.text-blue-600 { color: var(--primary-color); }
+.text-red-600 { color: var(--red-600); }
+.position-relative { position: relative; }
+.full-height { height: 100%; }
+.border-none { border: none !important; }
+.d-block { display: block !important; }
+.drag-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 10;
+  background: transparent;
+  cursor: move;
+}
+.w-100px { width: 100px !important; }
+// 進度條、按鈕等元件已自動跟隨 PrimeNG 主題
+
+.action-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+}
+// --------------------
+// 表格 Footer: 建立合約按鈕極簡樣式
+:host ::ng-deep .p-datatable .p-datatable-tfoot td {
+  border-top: none;
+}
+:host ::ng-deep .p-datatable .p-datatable-tfoot td .p-button-text {
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--primary-color);
+  padding: 0.5rem;
+}
+// ScrollPanel minimal modern scrollbars
+:host ::ng-deep .p-scrollpanel-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-border) transparent;
+}
+:host ::ng-deep .p-scrollpanel-content::-webkit-scrollbar {
+  width: 6px;
+}
+:host ::ng-deep .p-scrollpanel-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+:host ::ng-deep .p-scrollpanel-content::-webkit-scrollbar-thumb {
+  background-color: var(--surface-border);
+  border-radius: 3px;
+}
+
+// 變更金額對話框樣式
+:host ::ng-deep .p-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+:host ::ng-deep .p-inputnumber,
+:host ::ng-deep .p-inputtextarea {
+  width: 100%;
+}
+:host ::ng-deep .p-button-text.p-0 {
+  padding: 0.25rem;
+  min-width: auto;
+}
+
+// 提高進度標籤可視性
+:host ::ng-deep .p-tag {
+  font-size: 0.75rem;
+  margin-right: 0.25rem;
+}
+
+// 標籤欄位樣式
+:host ::ng-deep .p-chip {
+  font-size: 0.75rem;
+  background-color: var(--surface-100);
+  color: var(--text-color);
+}
+:host ::ng-deep .p-chip .p-chip-remove-icon {
+  font-size: 0.6rem;
+}
+// 追加/追減欄按鈕極簡排列
+:host ::ng-deep td .flex.flex-col.items-center {
+  gap: 0.15rem;
+}
+// 編號欄展開按鈕間距
+:host ::ng-deep .expand-btn {
+  margin-right: 0.25rem;
+  vertical-align: middle;
+}
+// 狀態/檔案欄上下間距
+:host ::ng-deep td .flex.flex-col.items-start {
+  gap: 0.25rem;
+}
+:host ::ng-deep .overflow-x-auto {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+:host ::ng-deep iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+

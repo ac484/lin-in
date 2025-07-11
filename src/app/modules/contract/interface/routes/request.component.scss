@@ -1,0 +1,14 @@
+.request-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  /* 依賴內建樣式，保持極簡 */
+  p-slider {
+    margin-top: 0.25rem;
+  }
+  /* 每行區塊全寬，保持排版一致 */
+  form > div {
+    width: 100%;
+  }
+}

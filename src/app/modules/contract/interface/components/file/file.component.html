@@ -1,0 +1,8 @@
+<label class="cursor-pointer">
+  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+      d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
+  </svg>
+  <input type="file" class="hidden" accept="application/pdf,image/*" (change)="onFileSelected($event)" [disabled]="!!contract.url || uploadingContractCode === contract.code" />
+</label>
+<span *ngIf="uploadingContractCode === contract.code" class="text-xs text-gray-500 ml-2">上傳中...</span> 

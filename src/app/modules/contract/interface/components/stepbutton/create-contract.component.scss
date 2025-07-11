@@ -1,0 +1,32 @@
+/* StepButtonComponent 極簡樣式 */
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.gap-4 {
+  gap: 1rem;
+}
+.p-4 {
+  padding: 1rem;
+}
+.justify-end {
+  justify-content: flex-end;
+}
+.mt-4 {
+  margin-top: 1rem;
+}
+:host {
+  font-family: inherit;
+  color: var(--text-color);
+  font-size: 1rem;
+}
+.text-xs { font-size: 0.75rem; color: var(--text-color-secondary, #6b7280); }
+.font-bold { font-weight: 700; }
+.text-blue-600 { color: var(--primary-color); }
+.text-red-600 { color: var(--red-600); }
+.text-gray-500 { color: var(--text-color-secondary, #6b7280); }
+.underline {
+  text-decoration: underline;
+} 
