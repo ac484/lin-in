@@ -175,13 +175,13 @@
       (onResizeEnd)="onVerticalSplitterResizeEnd()">
       <!-- 上：PDF 預覽 -->
       <ng-template #panel [stateKey]="'panel2-top'">
-        <div class="flex flex-col items-center justify-center h-full w-full position-relative full-height">
+        <p-scrollPanel style="width:100%; height:100%;" class="position-relative full-height">
           <object *ngIf="safeUrl" [data]="safeUrl" type="application/pdf" width="100%" height="100%" class="border-none d-block">
             <div>無法預覽 PDF，請<a [href]="safeUrl" target="_blank" class="text-blue-600 underline">下載檔案</a>。</div>
           </object>
           <div *ngIf="dragging" class="drag-overlay"></div>
           <div *ngIf="!safeUrl" class="text-gray-500">請選擇有 PDF 檔案的合約</div>
-        </div>
+        </p-scrollPanel>
       </ng-template>
       <!-- 下：備忘錄區 -->
       <ng-template #panel [stateKey]="'panel2-bottom'">
