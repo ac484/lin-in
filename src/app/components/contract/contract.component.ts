@@ -26,6 +26,7 @@ import { TagModule } from 'primeng/tag';
 import { collection as firestoreCollection, query, where, orderBy, onSnapshot, addDoc, deleteDoc, serverTimestamp, getDocs, Timestamp, QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { Injector, runInInjectionContext } from '@angular/core';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
+import { DocsviewerComponent } from '../../shared/components/docsviewer/docsviewer.component';
 
 export interface PaymentRecord {
   round: number; // 請款輪次
@@ -81,7 +82,7 @@ interface Message {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, ScrollPanelModule, StepButtonComponent, MessagesComponent, FileComponent, OrganizationalComponent, RequestComponent, TagModule, ChipsComponent],
+  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, ScrollPanelModule, StepButtonComponent, MessagesComponent, FileComponent, OrganizationalComponent, RequestComponent, TagModule, ChipsComponent, DocsviewerComponent],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
@@ -93,9 +94,6 @@ export class ContractComponent implements OnInit, OnDestroy {
   loading = true;
   uploadingContractCode: string | null = null;
   selectedContract: Contract | null = null;
-  safeUrl: SafeResourceUrl | null = null;
-  viewerUrl: SafeResourceUrl | null = null;
-  dragging = false;
   showStepper = false;
   expandedContracts = new Set<string>();
   // 請款相關屬性與方法已移除
@@ -263,28 +261,13 @@ export class ContractComponent implements OnInit, OnDestroy {
   // --------------------
   // UI 事件/操作
   // --------------------
-  isPdfUrl(url: string): boolean {
-    return url.includes('.pdf');
-  }
   onRowSelect(event: any): void {
     if (event.data) {
       this.selectedContract = event.data as Contract;
-      this.updateSafeUrl();
     }
   }
   selectContract(contract: Contract): void {
     this.selectedContract = contract;
-    this.updateSafeUrl();
-  }
-  updateSafeUrl(): void {
-    if (this.selectedContract && this.selectedContract.url && this.isPdfUrl(this.selectedContract.url)) {
-      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedContract.url);
-      const gviewUrl = `https://docs.google.com/gview?url=${encodeURIComponent(this.selectedContract.url)}&embedded=true`;
-      this.viewerUrl = this.sanitizer.bypassSecurityTrustResourceUrl(gviewUrl);
-    } else {
-      this.safeUrl = null;
-      this.viewerUrl = null;
-    }
   }
   // 移除 onContractFileSelected
   onUploading(code: string | null): void {
@@ -306,10 +289,6 @@ export class ContractComponent implements OnInit, OnDestroy {
     event.stopPropagation();
   }
   // 請款相關方法已移除
-  onSplitterResizeStart(): void { this.dragging = true; }
-  onSplitterResizeEnd(): void { this.dragging = false; }
-  onVerticalSplitterResizeStart(): void { this.dragging = true; }
-  onVerticalSplitterResizeEnd(): void { this.dragging = false; }
   onStepperCreated(data: { orderNo: string; projectNo: string; projectName: string; url: string; contractAmount: number; members: { name: string; role: string }[] }): void {
     const serialDoc = doc(this.firestore, 'meta/contract_serial');
     const contractsCol = collection(this.firestore, 'contracts');

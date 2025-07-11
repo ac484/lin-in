@@ -6,9 +6,7 @@
   [style]="{ height: '100vh' }"
   class="mb-8"
   [stateKey]="'panel1'"
-  (onResizeStart)="onSplitterResizeStart()"
-  (onResizeEnd)="onSplitterResizeEnd()"
->
+  >
   
   <!-- =====================
     Panel 1: 左側（合約列表 + 組織圖）
@@ -187,15 +185,11 @@
     Panel 2: 中間（PDF 預覽 + 備忘）
   ====================== -->
   <ng-template #panel>
-    <p-splitter [stateKey]="'panel2'" layout="vertical" [panelSizes]="[70, 30]"
-      (onResizeStart)="onVerticalSplitterResizeStart()"
-      (onResizeEnd)="onVerticalSplitterResizeEnd()">
+    <p-splitter [stateKey]="'panel2'" layout="vertical" [panelSizes]="[70, 30]">
       <!-- 上：PDF 預覽 -->
       <ng-template #panel [stateKey]="'panel2-top'">
         <p-scrollPanel style="width:100%; height:100%;" class="position-relative full-height">
-          <iframe *ngIf="viewerUrl" [src]="viewerUrl" width="100%" height="100%" frameborder="0"></iframe>
-          <div *ngIf="dragging" class="drag-overlay"></div>
-          <div *ngIf="!viewerUrl" class="text-gray-500">請選擇有 PDF 檔案的合約</div>
+          <app-docsviewer [src]="selectedContract?.url ?? null"></app-docsviewer>
         </p-scrollPanel>
       </ng-template>
       <!-- 下：備忘錄區 -->
