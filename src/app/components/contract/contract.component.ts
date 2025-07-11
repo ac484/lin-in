@@ -35,6 +35,14 @@ export interface PaymentRecord {
   note?: string; // 備註
 }
 
+export interface ChangeRecord {
+  type: '追加' | '追減'; // 變更類型
+  amount: number; // 變更金額
+  note?: string; // 備註
+  date: string; // 變更日期
+  user: string; // 變更操作人
+}
+
 export interface Contract {
   status: string; // 合約狀態
   code: string; // 合約編號
@@ -52,6 +60,7 @@ export interface Contract {
   note: string; // 備註
   url: string; // 檔案下載連結
   payments?: PaymentRecord[]; // 請款紀錄
+  changes?: ChangeRecord[]; // 變更紀錄
   members?: { name: string; role: string }[]; // 合約成員
 }
 
@@ -86,6 +95,56 @@ export class ContractComponent implements OnInit, OnDestroy {
   showStepper = false;
   expandedContracts = new Set<string>();
   // 請款相關屬性與方法已移除
+
+  // 新增：變更功能屬性
+  showChangeDialog = false;
+  changeType: '追加' | '追減' = '追加';
+  selectedContractForChange: Contract | null = null;
+  changeData = { amount: 0, note: '' };
+  
+  // 新增：開啟變更對話框
+  openChangeDialog(contract: Contract, type: '追加' | '追減', event: Event): void {
+    event.stopPropagation();
+    this.selectedContractForChange = contract;
+    this.changeType = type;
+    this.changeData = { amount: 0, note: '' };
+    this.showChangeDialog = true;
+  }
+
+  // 新增：取消變更
+  cancelChange(): void {
+    this.showChangeDialog = false;
+    this.selectedContractForChange = null;
+    this.changeData = { amount: 0, note: '' };
+  }
+  
+  // 新增：執行變更
+  executeChange(): void {
+    if (!this.selectedContractForChange || this.changeData.amount <= 0) {
+      return;
+    }
+    const contract = this.selectedContractForChange;
+    if ((contract as any).id) {
+      const originalAmount = contract.contractAmount;
+      const newAmount = this.changeType === '追加'
+        ? originalAmount + this.changeData.amount
+        : originalAmount - this.changeData.amount;
+      const changeRecord: ChangeRecord = {
+        type: this.changeType,
+        amount: this.changeData.amount,
+        note: this.changeData.note,
+        date: new Date().toISOString(),
+        user: this.user?.displayName || this.user?.email || '未知'
+      };
+      const updatedChanges = [...(contract.changes || []), changeRecord];
+      const contractDoc = firestoreDoc(this.firestore, 'contracts', (contract as any).id);
+      updateDoc(contractDoc, {
+        contractAmount: newAmount,
+        changes: updatedChanges
+      });
+      this.showChangeDialog = false;
+    }
+  }
 
   // --------------------
   // Firestore/Storage/DI
@@ -332,22 +391,47 @@ export class ContractComponent implements OnInit, OnDestroy {
     const diffTime = Date.now() - creationDate.getTime();
     return Math.floor(diffTime / (1000 * 60 * 60 * 24));
   }
+  // 修改：事件紀錄包含變更與請款
   getEventLog(contract: Contract): string[] {
-    if (!contract.payments) return [];
-    return contract.payments.map(p =>
-      `第${p.round}次 [${p.status ?? '未知'}] 金額${p.percent}% 申請人${p.applicant}` +
-      (p.date ? ` 日期${p.date.slice(0, 10)}` : '') +
-      (p.note ? ` 備註${p.note}` : '')
-    );
+    const changeLogs = (contract.changes || []).map(c => ({
+      label: `[變更][${c.type}]${c.amount.toLocaleString()} 元` + (c.note ? ` [備註]：${c.note}` : ''),
+      date: c.date
+    }));
+    const paymentLogs = (contract.payments || []).map(p => ({
+      label:
+        `第${p.round}次 [${p.status ?? '未知'}] 金額${p.percent}% 申請人${p.applicant}` +
+        (p.date ? ` 日期${p.date.slice(0, 10)}` : '') +
+        (p.note ? ` 備註${p.note}` : ''),
+      date: p.date || ''
+    }));
+    const allLogs = [...changeLogs, ...paymentLogs].sort((a, b) => a.date.localeCompare(b.date));
+    return allLogs.map(l => l.label);
   }
+  // 修改：歷程 Timeline 包含變更與請款
   getEventTimeline(contract: Contract): { label: string; date: string }[] {
-    if (!contract.payments) return [];
-    return contract.payments.map(p => ({
+    const changeTimeline = (contract.changes || []).map(c => ({
+      label: `[變更][${c.type}]${c.amount.toLocaleString()} 元` + (c.note ? ` [備註]：${c.note}` : ''),
+      date: c.date
+    }));
+    const paymentTimeline = (contract.payments || []).map(p => ({
       label:
         `第${p.round}次 [${p.status ?? '未知'}] 金額${p.percent}% 申請人${p.applicant}` +
         (p.note ? ` 備註${p.note}` : ''),
       date: p.date || ''
     }));
+    const allTimeline = [...changeTimeline, ...paymentTimeline].sort((a, b) => a.date.localeCompare(b.date));
+    return allTimeline;
+  }
+  // 計算合約淨變更額（追加正、追減負）
+  getNetChange(contract: Contract): number {
+    return (contract.changes ?? []).reduce((sum, c) =>
+      sum + (c.type === '追加' ? c.amount : -c.amount), 0
+    );
+  }
+
+  // 計算原始合約金額（現行金額扣除淨變更）
+  getOriginalAmount(contract: Contract): number {
+    return contract.contractAmount - this.getNetChange(contract);
   }
   // 備忘錄相關移除
   getNow(): number {

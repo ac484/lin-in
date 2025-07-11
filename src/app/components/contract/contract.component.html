@@ -38,6 +38,7 @@
               <th>進度摘要</th>
               <th>操作</th>
               <th>申請</th>
+              <th>變更</th>
               <th>檔案</th>
             </tr>
           </ng-template>
@@ -54,7 +55,11 @@
                 <div>{{ contract.projectNo }}</div>
                 <div>{{ contract.projectName }}</div>
               </td>
-              <td>{{ contract.contractAmount | number:'1.0-0' }}</td>
+              <td class="flex flex-col">
+                <div>原始: {{ getOriginalAmount(contract) | number:'1.0-2' }}</div>
+                <div>變更: {{ getNetChange(contract) | number:'1.0-2' }}</div>
+                <div>現行: {{ contract.contractAmount | number:'1.0-2' }}</div>
+              </td>
               <td>
                 <div class="flex flex-col text-xs">
                   <ng-container *ngFor="let item of [
@@ -82,6 +87,12 @@
               <td (click)="$event.stopPropagation()">
                 <button pButton type="button" icon="pi pi-plus-circle" class="p-button-text p-0"
                   (click)="requestComponent.open(contract, user)"></button>
+              </td>
+              <td (click)="$event.stopPropagation()">
+                <button pButton type="button" icon="pi pi-plus" class="p-button-text p-0"
+                  (click)="openChangeDialog(contract, '追加', $event)"></button>
+                <button pButton type="button" icon="pi pi-minus" class="p-button-text p-0 text-red-600"
+                  (click)="openChangeDialog(contract, '追減', $event)"></button>
               </td>
               <td (click)="$event.stopPropagation()">
                 <app-file [contract]="contract" [uploadingContractCode]="uploadingContractCode" (uploading)="onUploading($event)" (uploaded)="onUploaded($event)"></app-file>
@@ -143,7 +154,7 @@
           <!-- 表格底部：建立合約按鈕 -->
           <ng-template pTemplate="footer">
             <tr>
-              <td colspan="8" class="text-center p-0">
+              <td colspan="9" class="text-center p-0">
                 <button pButton type="button" class="p-button-text" (click)="showStepper = true">＋ 建立合約</button>
               </td>
             </tr>
@@ -211,3 +222,44 @@
 ====================== -->
 <!-- 移除原本 p-dialog 區塊 -->
 <app-request #requestComponent (completed)="onRequestCompleted()"></app-request>
+
+<!-- 新增：變更金額對話框 -->
+<p-dialog 
+  [(visible)]="showChangeDialog" 
+  [modal]="true" 
+  [closable]="true" 
+  [dismissableMask]="true" 
+  [style]="{width: '400px'}" 
+  header="{{changeType}}金額" 
+  (onHide)="cancelChange()">
+  <div class="flex flex-col gap-4">
+    <div *ngIf="selectedContractForChange" class="text-sm text-gray-600">
+      合約：{{selectedContractForChange.code}} - {{selectedContractForChange.projectName}}
+    </div>
+    <div class="flex flex-col gap-2">
+      <label class="font-medium">金額</label>
+      <p-inputNumber 
+        [(ngModel)]="changeData.amount" 
+        [min]="0" 
+        styleClass="w-full"
+        placeholder="請輸入金額">
+      </p-inputNumber>
+    </div>
+    <div class="flex flex-col gap-2">
+      <label class="font-medium">備註</label>
+      <textarea 
+        [(ngModel)]="changeData.note" 
+        pInputTextarea 
+        [rows]="3" 
+        styleClass="w-full"
+        placeholder="請輸入備註">
+      </textarea>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2">
+      <button pButton type="button" label="取消" class="p-button-text" (click)="cancelChange()"></button>
+      <button pButton type="button" label="確認" (click)="executeChange()" [disabled]="changeData.amount<=0"></button>
+    </div>
+  </ng-template>
+</p-dialog>
