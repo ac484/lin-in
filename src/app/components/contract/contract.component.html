@@ -18,8 +18,17 @@
       <!-- 組織圖 -->
       <app-organizational [contract]="selectedContract" [defaultLabel]="selectedContract?.projectName || '專案團隊'"></app-organizational>
       <!-- 合約列表 Table -->
-      <p-table [value]="contracts" styleClass="p-datatable-sm w-full" [tableStyle]="{ 'font-size': '13px' }" [responsiveLayout]="'scroll'"
-        selectionMode="single" [(selection)]="selectedContract" dataKey="code" [rowHover]="true"
+      <p-table
+        [value]="contracts"
+        scrollable="true"
+        scrollHeight="flex"
+        styleClass="p-datatable-sm w-full"
+        [tableStyle]="{ 'font-size': '13px' }"
+        [responsiveLayout]="'scroll'"
+        selectionMode="single"
+        [(selection)]="selectedContract"
+        dataKey="code"
+        [rowHover]="true"
         (onRowSelect)="onRowSelect($event)">
         <ng-template pTemplate="header">
           <tr>
