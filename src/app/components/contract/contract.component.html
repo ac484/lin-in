@@ -57,12 +57,17 @@
             </td>
             <td>{{ contract.contractAmount | number:'1.0-0' }}</td>
             <td>
-              <div class="flex items-center gap-2">
-                <span class="text-sm">{{ getProgressSummary(contract) }}</span>
-                <div class="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div class="h-full bg-blue-500 transition-all duration-300" 
-                       [style.width.%]="getTotalProgressPercent(contract)"></div>
-                </div>
+              <div class="flex flex-col text-xs">
+                <ng-container *ngFor="let item of [
+                  {label: '未開始', data: getProgressSummary(contract).notStarted},
+                  {label: '進行中', data: getProgressSummary(contract).inProgress},
+                  {label: '已完成', data: getProgressSummary(contract).completed}
+                ]">
+                  <div *ngIf="item.data.percent > 0" class="flex justify-between">
+                    <span>{{ item.label }}({{ item.data.count }})</span>
+                    <span>{{ item.data.percent }}%</span>
+                  </div>
+                </ng-container>
               </div>
             </td>
             <td (click)="$event.stopPropagation()">

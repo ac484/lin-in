@@ -256,23 +256,44 @@ export class ContractComponent implements OnInit, OnDestroy {
   // --------------------
   // 工具/輔助方法
   // --------------------
-  getProgressSummary(contract: Contract): string {
+  getProgressSummary(contract: Contract): {notStarted: {count: number, percent: number}, inProgress: {count: number, percent: number}, completed: {count: number, percent: number}} {
     if (!contract.payments || contract.payments.length === 0) {
-      return '未請款';
+      return {
+        notStarted: {count: 1, percent: 100},
+        inProgress: {count: 0, percent: 0},
+        completed: {count: 0, percent: 0}
+      };
     }
-    const completed = contract.payments.filter(p => p.status === '完成').length;
-    const total = contract.payments.length;
-    const inProgress = contract.payments.filter(p => 
-      p.status && !['完成', '已拒絕'].includes(p.status)
-    ).length;
     
-    if (completed === total) {
-      return '已完成';
+    const totalAmount = contract.contractAmount;
+    if (totalAmount <= 0) {
+      return {
+        notStarted: {count: 1, percent: 100},
+        inProgress: {count: 0, percent: 0},
+        completed: {count: 0, percent: 0}
+      };
     }
-    if (inProgress > 0) {
-      return `進行中 ${completed}/${total}`;
-    }
-    return `${completed}/${total}`;
+    
+    // 計算各狀態的數量和金額
+    const completedPayments = contract.payments.filter(p => p.status === '完成');
+    const inProgressPayments = contract.payments.filter(p => p.status && !['完成', '已拒絕'].includes(p.status));
+    
+    const completedAmount = completedPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const inProgressAmount = inProgressPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const totalPaymentAmount = contract.payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+    
+    const completedPercent = Math.round((completedAmount / totalAmount) * 100);
+    const inProgressPercent = Math.round((inProgressAmount / totalAmount) * 100);
+    const notStartedPercent = Math.max(0, 100 - Math.round((totalPaymentAmount / totalAmount) * 100));
+    
+    // 未開始數量：如果還有未申請的部分，顯示為1，否則為0
+    const notStartedCount = notStartedPercent > 0 ? 1 : 0;
+    
+    return {
+      notStarted: {count: notStartedCount, percent: notStartedPercent},
+      inProgress: {count: inProgressPayments.length, percent: inProgressPercent},
+      completed: {count: completedPayments.length, percent: completedPercent}
+    };
   }
 
   getTotalProgressPercent(contract: Contract): number {

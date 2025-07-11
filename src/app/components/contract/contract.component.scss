@@ -26,9 +26,12 @@
 
 // 進度摘要樣式
 .flex { display: flex; }
+.flex-col { flex-direction: column; }
 .items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
 .gap-2 { gap: 0.5rem; }
 .text-sm { font-size: 0.875rem; }
+.text-xs { font-size: 0.75rem; }
 .w-16 { width: 4rem; }
 .h-2 { height: 0.5rem; }
 .bg-gray-200 { background-color: #e5e7eb; }
