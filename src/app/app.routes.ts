@@ -9,5 +9,7 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'passport', component: PassportComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'contract', component: ContractComponent, canActivate: [authGuard] }
+  { path: 'contract', component: ContractComponent, canActivate: [authGuard] },
+  { path: 'workspace', component: ContractComponent, canActivate: [authGuard] }
+
 ];

@@ -72,6 +72,7 @@ export class AppTopbar {
   menuItems = [
     { label: '儀表板', icon: 'pi pi-chart-bar', routerLink: '/dashboard' },
     { label: '合約', icon: 'pi pi-file', routerLink: '/contract' },
+    { label: '工作空間', icon: 'pi pi-folder', routerLink: '/workspace' }
 
   ];
 

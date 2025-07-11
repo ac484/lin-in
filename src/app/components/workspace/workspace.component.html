@@ -1,0 +1,73 @@
+<!-- =====================
+  工作區主容器
+====================== -->
+<div class="workspace-container" *ngIf="!loading">
+  <!-- 已登入用戶顯示工作區內容 -->
+  <div *ngIf="user" class="w-full h-full">
+    <p-splitter [style]="{ height: '100vh' }" [stateKey]="'workspace-main'">
+      <!-- 主要工作區域 -->
+      <ng-template #panel>
+        <p-scrollPanel style="width:100%; height:100%;">
+          <div class="workspace-content p-4">
+            <div class="flex flex-col gap-4">
+              <!-- 歡迎區域 -->
+              <div class="welcome-section">
+                <h2 class="text-xl font-semibold mb-2">歡迎來到工作區</h2>
+                <p class="text-gray-600">{{ user.displayName || user.email }}</p>
+              </div>
+              
+              <!-- 工作區功能列表 -->
+              <div class="features-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="feature-card p-4 border rounded-lg">
+                  <h3 class="font-medium mb-2">文件管理</h3>
+                  <p class="text-sm text-gray-600">管理和編輯您的文件</p>
+                </div>
+                
+                <div class="feature-card p-4 border rounded-lg">
+                  <h3 class="font-medium mb-2">專案協作</h3>
+                  <p class="text-sm text-gray-600">與團隊成員協作專案</p>
+                </div>
+                
+                <div class="feature-card p-4 border rounded-lg">
+                  <h3 class="font-medium mb-2">工作流程</h3>
+                  <p class="text-sm text-gray-600">管理工作流程和任務</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-scrollPanel>
+      </ng-template>
+      
+      <!-- 側邊欄 -->
+      <ng-template #panel>
+        <p-scrollPanel style="width:100%; height:100%;">
+          <div class="sidebar-content p-3">
+            <div class="text-sm font-medium mb-3">快速功能</div>
+            <div class="flex flex-col gap-2">
+              <button pButton type="button" label="新建文件" class="p-button-sm p-button-outlined w-full"></button>
+              <button pButton type="button" label="上傳檔案" class="p-button-sm p-button-outlined w-full"></button>
+              <button pButton type="button" label="建立專案" class="p-button-sm p-button-outlined w-full"></button>
+            </div>
+          </div>
+        </p-scrollPanel>
+      </ng-template>
+    </p-splitter>
+  </div>
+  
+  <!-- 未登入用戶提示 -->
+  <div *ngIf="!user" class="flex items-center justify-center h-full">
+    <div class="text-center">
+      <i class="pi pi-lock text-4xl text-gray-400 mb-4"></i>
+      <h3 class="text-lg font-medium mb-2">需要登入</h3>
+      <p class="text-gray-600">請先登入以使用工作區功能</p>
+    </div>
+  </div>
+</div>
+
+<!-- Loading 狀態 -->
+<div *ngIf="loading" class="flex items-center justify-center h-full">
+  <div class="text-center">
+    <p-progressBar mode="indeterminate" [style]="{'height': '6px', 'width': '200px'}"></p-progressBar>
+    <p class="mt-2 text-sm text-gray-600">載入中...</p>
+  </div>
+</div>

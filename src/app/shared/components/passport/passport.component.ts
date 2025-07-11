@@ -59,7 +59,7 @@ export class PassportComponent {
     this.auth.loginWithGoogle()
       .then(() => {
         globalMessageBus.next({ severity: 'success', summary: '登入成功', detail: 'Google 登入成功' });
-        this.router.navigate(['/contract']);
+        this.showWorkspaceChoice();
       })
       .catch((e: Error) => this.error = e.message);
   }
@@ -70,9 +70,21 @@ export class PassportComponent {
     this.auth.loginWithEmail(this.email, this.password)
       .then(() => {
         globalMessageBus.next({ severity: 'success', summary: '登入成功', detail: 'Email 登入成功' });
-        this.router.navigate(['/contract']);
+        this.showWorkspaceChoice();
       })
       .catch((e: Error) => this.error = e.message);
+  }
+
+  showWorkspaceChoice() {
+    // 預設導向合約，並顯示進入工作區提示
+    this.router.navigate(['/contract']);
+    setTimeout(() => {
+      globalMessageBus.next({
+        severity: 'info',
+        summary: '已登入',
+        detail: '如需進入工作區，請點選上方「工作區」選單',
+      });
+    }, 500);
   }
 
   register() {
