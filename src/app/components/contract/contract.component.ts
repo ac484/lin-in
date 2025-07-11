@@ -157,7 +157,6 @@ export class ContractComponent implements OnInit, OnDestroy {
   private injector = inject(Injector);
   private pdfA4Pipe = new PdfA4Pipe();
   private sanitizer = inject(DomSanitizer);
-  private messagesUnsub: (() => void) | null = null;
 
   // --------------------
   // 資料流/常數
@@ -251,17 +250,12 @@ export class ContractComponent implements OnInit, OnDestroy {
   // 生命週期
   // --------------------
   ngOnInit(): void {
-    // 備忘錄相關移除
+    // 生命週期初始
   }
   ngOnDestroy() {
-    // 備忘錄相關移除
     this.destroyed$.next();
     this.destroyed$.complete();
   }
-
-  // --------------------
-  // 本地儲存/備忘錄、Firestore 留言相關、getMemoCooldown、getMessageDate、getNow 全部移除
-  // --------------------
 
   // --------------------
   // UI 事件/操作
@@ -273,13 +267,11 @@ export class ContractComponent implements OnInit, OnDestroy {
     if (event.data) {
       this.selectedContract = event.data as Contract;
       this.updateSafeUrl();
-      // 備忘錄相關移除
     }
   }
   selectContract(contract: Contract): void {
     this.selectedContract = contract;
     this.updateSafeUrl();
-    // 備忘錄相關移除
   }
   updateSafeUrl(): void {
     if (this.selectedContract && this.selectedContract.url && this.isPdfUrl(this.selectedContract.url)) {
