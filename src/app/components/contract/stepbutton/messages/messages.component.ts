@@ -5,6 +5,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
+import { ScrollPanelModule } from 'primeng/scrollpanel';
 
 interface Message {
   id?: string;
@@ -17,7 +18,7 @@ interface Message {
 @Component({
   selector: 'app-messages',
   standalone: true,
-  imports: [CommonModule, FormsModule, InputTextModule, ButtonModule, DatePipe],
+  imports: [CommonModule, FormsModule, InputTextModule, ButtonModule, DatePipe, ScrollPanelModule],
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.scss']
 })

@@ -27,4 +27,19 @@
 .font-bold { font-weight: 700; }
 .text-blue-600 { color: var(--primary-color); }
 .text-red-600 { color: var(--red-600); }
-.text-gray-500 { color: var(--text-color-secondary, #6b7280); } 
+.text-gray-500 { color: var(--text-color-secondary, #6b7280); }
+// ScrollPanel minimal modern scrollbars
+:host ::ng-deep .p-scrollpanel-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-border) transparent;
+}
+:host ::ng-deep .p-scrollpanel-content::-webkit-scrollbar {
+  width: 6px;
+}
+:host ::ng-deep .p-scrollpanel-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+:host ::ng-deep .p-scrollpanel-content::-webkit-scrollbar-thumb {
+  background-color: var(--surface-border);
+  border-radius: 3px;
+} 
