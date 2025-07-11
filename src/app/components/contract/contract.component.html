@@ -47,16 +47,7 @@
               (click)="selectContract(contract)">
               <td>{{ contract.code }}</td>
               <td>
-                <i [ngClass]="{
-                  'pi pi-clock': contract.status === '初始',
-                  'pi pi-spinner': contract.status === '申請中',
-                  'pi pi-user-check': contract.status === '審核中',
-                  'pi pi-file-invoice': contract.status === '開票中',
-                  'pi pi-credit-card': contract.status === '放款中',
-                  'pi pi-check-circle': contract.status === '完成',
-                  'pi pi-times-circle': contract.status === '已拒絕'
-                }" class="mr-1"></i>
-                {{ contract.status }}
+                {{ getDaysSinceCreation(contract) }} 天
               </td>
               <td>
                 <div>{{ contract.orderNo }}</div>
