@@ -103,3 +103,9 @@
   padding: 0.25rem;
   min-width: auto;
 }
+
+// 提高進度標籤可視性
+:host ::ng-deep .p-tag {
+  font-size: 0.75rem;
+  margin-right: 0.25rem;
+}

@@ -21,6 +21,7 @@ import { MessagesComponent } from './stepbutton/messages/messages.component';
 import { FileComponent } from './stepbutton/file/file.component';
 import { OrganizationalComponent } from './stepbutton/organizational/organizational.component';
 import { RequestComponent } from './stepbutton/request/request.component';
+import { TagModule } from 'primeng/tag';
 import { collection as firestoreCollection, query, where, orderBy, onSnapshot, addDoc, deleteDoc, serverTimestamp, getDocs, Timestamp, QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { Injector, runInInjectionContext } from '@angular/core';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
@@ -78,7 +79,7 @@ interface Message {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, ScrollPanelModule, StepButtonComponent, MessagesComponent, FileComponent, OrganizationalComponent, RequestComponent],
+  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, ScrollPanelModule, StepButtonComponent, MessagesComponent, FileComponent, OrganizationalComponent, RequestComponent, TagModule],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
@@ -436,5 +437,25 @@ export class ContractComponent implements OnInit, OnDestroy {
   // 備忘錄相關移除
   getNow(): number {
     return Date.now();
+  }
+
+  // 根據進度標籤回傳對應顏色
+  getStatusSeverity(label: string): 'success' | 'info' | 'warning' | 'danger' {
+    switch (label) {
+      case '未開始': return 'danger';
+      case '進行中': return 'warning';
+      case '已完成': return 'success';
+      default: return 'info';
+    }
+  }
+
+  /**
+   * 根據百分比回傳 HSL 漸變色：0% 紅色(0deg) -> 100% 綠色(120deg)
+   */
+  getPercentColor(percent: number): string {
+    // 限制在 [0,100]
+    const p = Math.min(100, Math.max(0, percent));
+    const hue = p * 1.2; // 0~120
+    return `hsl(${hue}, 100%, 40%)`;
   }
 } 
