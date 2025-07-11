@@ -430,7 +430,8 @@ export class ContractComponent implements OnInit, OnDestroy {
     const total = contract.payments
       .filter(p => p.status === status)
       .reduce((sum, p) => sum + (p.amount || 0), 0);
-    return Math.round((total / contract.contractAmount) * 100);
+    // 將進度保留兩位小數
+    return parseFloat(((total / contract.contractAmount) * 100).toFixed(2));
   }
   // 新增方法：計算合約建立至今經過的天數
   getDaysSinceCreation(contract: Contract): number {

@@ -132,3 +132,7 @@
 :host ::ng-deep td .flex.flex-col.items-start {
   gap: 0.25rem;
 }
+:host ::ng-deep .overflow-x-auto {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
