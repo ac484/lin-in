@@ -94,6 +94,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   uploadingContractCode: string | null = null;
   selectedContract: Contract | null = null;
   safeUrl: SafeResourceUrl | null = null;
+  viewerUrl: SafeResourceUrl | null = null;
   dragging = false;
   showStepper = false;
   expandedContracts = new Set<string>();
@@ -278,8 +279,11 @@ export class ContractComponent implements OnInit, OnDestroy {
   updateSafeUrl(): void {
     if (this.selectedContract && this.selectedContract.url && this.isPdfUrl(this.selectedContract.url)) {
       this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedContract.url);
+      const gviewUrl = `https://docs.google.com/gview?url=${encodeURIComponent(this.selectedContract.url)}&embedded=true`;
+      this.viewerUrl = this.sanitizer.bypassSecurityTrustResourceUrl(gviewUrl);
     } else {
       this.safeUrl = null;
+      this.viewerUrl = null;
     }
   }
   // 移除 onContractFileSelected
