@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Firestore, doc as firestoreDoc, updateDoc } from '@angular/fire/firestore';
 import type { Contract, PaymentRecord } from '../../contract.component';
 import { DialogModule } from 'primeng/dialog';
+import { SliderModule } from 'primeng/slider';
 
 // Add a minimal user info interface
 interface UserInfo {
@@ -14,7 +15,7 @@ interface UserInfo {
 @Component({
   selector: 'app-request',
   standalone: true,
-  imports: [CommonModule, FormsModule, DialogModule],
+  imports: [CommonModule, FormsModule, DialogModule, SliderModule],
   templateUrl: './request.component.html',
   styleUrls: ['./request.component.scss']
 })
@@ -33,7 +34,8 @@ export class RequestComponent {
     this.user = user;
     this.visible = true;
     this.paymentAmount = null;
-    this.paymentPercent = null;
+    this.paymentPercent = 0.5;
+    this.onPaymentPercentChange(this.paymentPercent);
     this.paymentNote = '';
   }
   close() {
@@ -41,18 +43,23 @@ export class RequestComponent {
   }
   onPaymentAmountChange(val: number): void {
     this.paymentAmount = val;
-    if (this.contract && this.contract.contractAmount) {
-      this.paymentPercent = this.contract.contractAmount > 0 ? Math.round((val / this.contract.contractAmount) * 100) : 0;
+    if (this.contract && this.contract.contractAmount > 0) {
+      // 計算百分比並四捨五入到0.5，最小為0.5%
+      let p = (val / this.contract.contractAmount) * 100;
+      p = Math.round(p * 2) / 2;
+      this.paymentPercent = p < 0.5 ? 0.5 : p;
     } else {
-      this.paymentPercent = 0;
+      this.paymentPercent = 0.5;
     }
   }
   onPaymentPercentChange(val: number): void {
-    this.paymentPercent = val;
+    // 強制最小0.5% 且步進已在滑桿設定
+    const percent = val < 0.5 ? 0.5 : val;
+    this.paymentPercent = percent;
     if (this.contract && this.contract.contractAmount) {
-      this.paymentAmount = Math.round((val / 100) * this.contract.contractAmount);
+      this.paymentAmount = Math.round((percent / 100) * this.contract.contractAmount);
     } else {
-      this.paymentAmount = 0;
+      this.paymentAmount = null;
     }
   }
   async submitPayment(): Promise<void> {

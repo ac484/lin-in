@@ -64,3 +64,14 @@
   gap: 0.25rem;
   align-items: flex-start;
 }
+// --------------------
+// 表格 Footer: 建立合約按鈕極簡樣式
+:host ::ng-deep .p-datatable .p-datatable-tfoot td {
+  border-top: none;
+}
+:host ::ng-deep .p-datatable .p-datatable-tfoot td .p-button-text {
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--primary-color);
+  padding: 0.5rem;
+}

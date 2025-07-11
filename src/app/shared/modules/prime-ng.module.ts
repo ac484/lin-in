@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
+// Angular 通用模組
 import { CommonModule } from '@angular/common';
+// PrimeNG 訊息模組
 import { MessageModule } from 'primeng/message';
 // PrimeNG 按鈕模組
 import { ButtonModule } from 'primeng/button';
@@ -72,8 +74,12 @@ import { DragDropModule } from 'primeng/dragdrop';
 import { StepperModule } from 'primeng/stepper';
 // PrimeNG 捲軸模組
 import { ScrollerModule } from 'primeng/scroller';
+// PrimeNG 選擇模組
 import { SelectModule } from 'primeng/select';
+// PrimeNG 日期選擇模組
 import { DatePickerModule } from 'primeng/datepicker';
+// PrimeNG 滑桿模組
+import { SliderModule } from 'primeng/slider'; 
 
 @NgModule({
   imports: [
@@ -118,6 +124,7 @@ import { DatePickerModule } from 'primeng/datepicker';
     ScrollerModule,
     SelectModule,
     DatePickerModule,
+    SliderModule,
   ],
   exports: [
     CommonModule,
@@ -161,6 +168,7 @@ import { DatePickerModule } from 'primeng/datepicker';
     ScrollerModule,
     SelectModule,
     DatePickerModule,
+    SliderModule,
   ]
 })
 export class PrimeNgModule {}

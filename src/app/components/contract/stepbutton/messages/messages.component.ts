@@ -3,6 +3,8 @@ import { Firestore, collection as firestoreCollection, query, where, orderBy, on
 import { Subject } from 'rxjs';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
 
 interface Message {
   id?: string;
@@ -15,7 +17,7 @@ interface Message {
 @Component({
   selector: 'app-messages',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe],
+  imports: [CommonModule, FormsModule, InputTextModule, ButtonModule, DatePipe],
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.scss']
 })
