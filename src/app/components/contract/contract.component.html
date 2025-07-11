@@ -14,11 +14,11 @@
     Panel 1: 左側（合約列表 + 組織圖）
   ====================== -->
   <ng-template #panel>
-    <div class="flex flex-col items-center justify-start h-full gap-2">
+    <div class="flex flex-col items-center justify-start h-full gap-2 min-h-0">
       <!-- 組織圖 -->
       <app-organizational [contract]="selectedContract"></app-organizational>
       <!-- 合約列表 Table 滾動面板 -->
-      <p-scrollPanel style="flex:1; width:100%; height:100%;">
+      <p-scrollPanel class="flex-1 w-full min-h-0">
         <p-table
           [value]="contracts"
           styleClass="p-datatable-sm"
