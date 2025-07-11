@@ -476,11 +476,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   getOriginalAmount(contract: Contract): number {
     return contract.contractAmount - this.getNetChange(contract);
   }
-  // 備忘錄相關移除
-  getNow(): number {
-    return Date.now();
-  }
-
+  
   // 根據進度標籤回傳對應顏色
   getStatusSeverity(label: string): 'success' | 'info' | 'warning' | 'danger' {
     switch (label) {
