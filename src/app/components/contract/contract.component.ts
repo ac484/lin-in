@@ -23,6 +23,7 @@ import { OrganizationalComponent } from './stepbutton/organizational/organizatio
 import { RequestComponent } from './stepbutton/request/request.component';
 import { collection as firestoreCollection, query, where, orderBy, onSnapshot, addDoc, deleteDoc, serverTimestamp, getDocs, Timestamp, QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { Injector, runInInjectionContext } from '@angular/core';
+import { ScrollPanelModule } from 'primeng/scrollpanel';
 
 export interface PaymentRecord {
   round: number; // 請款輪次
@@ -68,7 +69,7 @@ interface Message {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, StepButtonComponent, MessagesComponent, FileComponent, OrganizationalComponent, RequestComponent],
+  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, ScrollPanelModule, StepButtonComponent, MessagesComponent, FileComponent, OrganizationalComponent, RequestComponent],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })

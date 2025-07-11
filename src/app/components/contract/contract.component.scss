@@ -75,3 +75,18 @@
   color: var(--primary-color);
   padding: 0.5rem;
 }
+// ScrollPanel minimal modern scrollbars
+:host ::ng-deep .p-scrollpanel-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-border) transparent;
+}
+:host ::ng-deep .p-scrollpanel-content::-webkit-scrollbar {
+  width: 6px;
+}
+:host ::ng-deep .p-scrollpanel-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+:host ::ng-deep .p-scrollpanel-content::-webkit-scrollbar-thumb {
+  background-color: var(--surface-border);
+  border-radius: 3px;
+}
