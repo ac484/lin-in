@@ -80,6 +80,9 @@ import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 // PrimeNG 滑桿模組
 import { SliderModule } from 'primeng/slider'; 
+// PrimeNG 小標籤模組
+import { ChipModule } from 'primeng/chip';
+
 
 @NgModule({
   imports: [
@@ -125,6 +128,7 @@ import { SliderModule } from 'primeng/slider';
     SelectModule,
     DatePickerModule,
     SliderModule,
+    ChipModule,
   ],
   exports: [
     CommonModule,
@@ -169,6 +173,7 @@ import { SliderModule } from 'primeng/slider';
     SelectModule,
     DatePickerModule,
     SliderModule,
+    ChipModule,
   ]
 })
 export class PrimeNgModule {}

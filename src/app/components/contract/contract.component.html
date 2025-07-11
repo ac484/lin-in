@@ -36,6 +36,7 @@
               <th>合約資訊</th>
               <th>合約金額</th>
               <th>進度摘要</th>
+              <th>標籤</th>
               <th>操作</th>
               <th>申請</th>
               <th>變更</th>
@@ -80,6 +81,12 @@
                 </div>
               </td>
               <td (click)="$event.stopPropagation()">
+                <app-chips 
+                  [tags]="contract.tags || []" 
+                  (tagsChange)="updateContractTags(contract, $event)">
+                </app-chips>
+              </td>
+              <td (click)="$event.stopPropagation()">
                 <button
                   pButton
                   type="button"
@@ -104,7 +111,7 @@
               </td>
             </tr>
             <tr *ngIf="expandedContracts.has(contract.code)">
-              <td colspan="12">
+              <td colspan="13">
                 <div class="flex flex-col gap-2">
                   <span>請款紀錄：</span>
                   <ng-container *ngIf="contract.payments?.length; else noPayments">
@@ -159,7 +166,7 @@
           <!-- 表格底部：建立合約按鈕 -->
           <ng-template pTemplate="footer">
             <tr>
-              <td colspan="9" class="text-center p-0">
+              <td colspan="10" class="text-center p-0">
                 <button pButton type="button" class="p-button-text" (click)="showStepper = true">＋ 建立合約</button>
               </td>
             </tr>

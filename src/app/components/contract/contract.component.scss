@@ -109,3 +109,13 @@
   font-size: 0.75rem;
   margin-right: 0.25rem;
 }
+
+// 標籤欄位樣式
+:host ::ng-deep .p-chip {
+  font-size: 0.75rem;
+  background-color: var(--surface-100);
+  color: var(--text-color);
+}
+:host ::ng-deep .p-chip .p-chip-remove-icon {
+  font-size: 0.6rem;
+}

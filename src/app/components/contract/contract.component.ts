@@ -21,6 +21,7 @@ import { MessagesComponent } from './stepbutton/messages/messages.component';
 import { FileComponent } from './stepbutton/file/file.component';
 import { OrganizationalComponent } from './stepbutton/organizational/organizational.component';
 import { RequestComponent } from './stepbutton/request/request.component';
+import { ChipsComponent } from '../../shared/components/chips/chips.component';
 import { TagModule } from 'primeng/tag';
 import { collection as firestoreCollection, query, where, orderBy, onSnapshot, addDoc, deleteDoc, serverTimestamp, getDocs, Timestamp, QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { Injector, runInInjectionContext } from '@angular/core';
@@ -63,6 +64,7 @@ export interface Contract {
   payments?: PaymentRecord[]; // 請款紀錄
   changes?: ChangeRecord[]; // 變更紀錄
   members?: { name: string; role: string }[]; // 合約成員
+  tags?: string[]; // 合約標籤
 }
 
 interface Message {
@@ -79,7 +81,7 @@ interface Message {
 @Component({
   selector: 'app-contract',
   standalone: true,
-  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, ScrollPanelModule, StepButtonComponent, MessagesComponent, FileComponent, OrganizationalComponent, RequestComponent, TagModule],
+  imports: [CommonModule, ProgressBarModule, ToastModule, PrimeNgModule, FormsModule, ScrollPanelModule, StepButtonComponent, MessagesComponent, FileComponent, OrganizationalComponent, RequestComponent, TagModule, ChipsComponent],
   templateUrl: './contract.component.html',
   styleUrls: ['./contract.component.scss']
 })
@@ -333,7 +335,8 @@ export class ContractComponent implements OnInit, OnDestroy {
         note: '',
         url: data.url,
         members: data.members,
-        payments: []
+        payments: [],
+        tags: []
       };
       transaction.set(doc(contractsCol), contract);
     });
@@ -348,6 +351,15 @@ export class ContractComponent implements OnInit, OnDestroy {
     if ((contract as any).id) {
       const contractDoc = firestoreDoc(this.firestore, 'contracts', (contract as any).id);
       updateDoc(contractDoc, { payments: contract.payments });
+    }
+  }
+
+  // 更新合約標籤
+  updateContractTags(contract: Contract, tags: string[]): void {
+    contract.tags = tags;
+    if ((contract as any).id) {
+      const contractDoc = firestoreDoc(this.firestore, 'contracts', (contract as any).id);
+      updateDoc(contractDoc, { tags });
     }
   }
   onRequestCompleted() {
