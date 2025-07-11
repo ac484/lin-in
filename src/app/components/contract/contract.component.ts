@@ -35,23 +35,23 @@ export interface PaymentRecord {
 }
 
 export interface Contract {
-  status: string;
-  code: string;
-  orderNo: string;
-  orderDate: string;
-  projectNo: string;
-  projectName: string;
-  contractAmount: number;
-  pendingPercent: number;
-  invoicedAmount: number;
-  paymentRound: number;
-  paymentPercent: number;
-  paymentStatus: string;
-  invoiceStatus: string;
-  note: string;
-  url: string;
-  payments?: PaymentRecord[];
-  members?: { name: string; role: string }[];
+  status: string; // 合約狀態
+  code: string; // 合約編號
+  orderNo: string; // 訂單編號
+  orderDate: string; // 訂單日期
+  projectNo: string; // 專案編號
+  projectName: string; // 專案名稱
+  contractAmount: number; // 合約金額
+  pendingPercent: number; // 尚未請款百分比 (可由 payments 計算)
+  invoicedAmount: number; // 已開立金額 (可由 payments 計算)
+  paymentRound: number; // 請款輪次 (可由 payments.length 計算)
+  paymentPercent: number; // 請款百分比 (可由 payments 計算)
+  paymentStatus: string; // 請款狀態 (可由 payments 計算)
+  invoiceStatus: string; // 發票狀態
+  note: string; // 備註
+  url: string; // 檔案下載連結
+  payments?: PaymentRecord[]; // 請款紀錄
+  members?: { name: string; role: string }[]; // 合約成員
 }
 
 interface Message {
@@ -219,19 +219,20 @@ export class ContractComponent implements OnInit, OnDestroy {
         status: '新建',
         code,
         orderNo: data.orderNo,
-        orderDate: '',
+        orderDate: new Date().toISOString().split('T')[0],
         projectNo: data.projectNo,
         projectName: data.projectName,
         contractAmount: data.contractAmount,
+        pendingPercent: 100,
         invoicedAmount: 0,
         paymentRound: 1,
         paymentPercent: 0,
         paymentStatus: '未請款',
         invoiceStatus: '未開立',
-        pendingPercent: 100,
         note: '',
         url: data.url,
-        members: data.members
+        members: data.members,
+        payments: []
       };
       transaction.set(doc(contractsCol), contract);
     });
@@ -255,6 +256,37 @@ export class ContractComponent implements OnInit, OnDestroy {
   // --------------------
   // 工具/輔助方法
   // --------------------
+  getProgressSummary(contract: Contract): string {
+    if (!contract.payments || contract.payments.length === 0) {
+      return '未請款';
+    }
+    const completed = contract.payments.filter(p => p.status === '完成').length;
+    const total = contract.payments.length;
+    const inProgress = contract.payments.filter(p => 
+      p.status && !['完成', '已拒絕'].includes(p.status)
+    ).length;
+    
+    if (completed === total) {
+      return '已完成';
+    }
+    if (inProgress > 0) {
+      return `進行中 ${completed}/${total}`;
+    }
+    return `${completed}/${total}`;
+  }
+
+  getTotalProgressPercent(contract: Contract): number {
+    if (!contract.payments || contract.payments.length === 0) {
+      return 0;
+    }
+    const totalAmount = contract.payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const completedAmount = contract.payments
+      .filter(p => p.status === '完成')
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+    
+    return contract.contractAmount > 0 ? Math.round((completedAmount / contract.contractAmount) * 100) : 0;
+  }
+
   getInvoicedPercent(contract: Contract): number {
     if (!contract.invoicedAmount || !contract.contractAmount) return 0;
     return Math.round((contract.invoicedAmount / contract.contractAmount) * 100);

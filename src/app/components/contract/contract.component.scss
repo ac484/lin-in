@@ -23,7 +23,22 @@
     color: var(--text-color);
   }
 }
-// .organization-chart-top, .font-bold, .text-xs, .text-gray-500 樣式已遷移
+
+// 進度摘要樣式
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-2 { gap: 0.5rem; }
+.text-sm { font-size: 0.875rem; }
+.w-16 { width: 4rem; }
+.h-2 { height: 0.5rem; }
+.bg-gray-200 { background-color: #e5e7eb; }
+.bg-blue-500 { background-color: #3b82f6; }
+.rounded-full { border-radius: 9999px; }
+.overflow-hidden { overflow: hidden; }
+.transition-all { transition: all 0.3s ease; }
+.duration-300 { transition-duration: 300ms; }
+
+// 原有樣式保持不變
 .text-blue-600 { color: var(--primary-color); }
 .text-red-600 { color: var(--red-600); }
 .position-relative { position: relative; }
