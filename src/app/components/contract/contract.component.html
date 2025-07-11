@@ -82,7 +82,7 @@
               <app-file [contract]="contract" [uploadingContractCode]="uploadingContractCode" (uploading)="onUploading($event)" (uploaded)="onUploaded($event)"></app-file>
             </td>
           </tr>
-          <tr *ngIf="contract.expanded">
+          <tr *ngIf="expandedContracts.has(contract.code)">
             <td colspan="12">
               <div class="flex flex-col gap-2">
                 <span>請款紀錄：</span>

@@ -1,24 +1,45 @@
 // 本檔案依據 Firebase Console 專案設定，使用 Firebase Client SDK 操作 Authentication
 // user$ 只會 emit null（未登入）或 User（已登入），不會有 undefined 狀態
 import { Injectable, inject } from '@angular/core';
-import { Auth, authState, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut, UserCredential, createUserWithEmailAndPassword } from '@angular/fire/auth';
+import { Auth, authState, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut, UserCredential, createUserWithEmailAndPassword, User } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
+import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private auth = inject(Auth);
-  user$: Observable<unknown> = authState(this.auth);
+  private firestore = inject(Firestore);
+  user$: Observable<User | null> = authState(this.auth);
 
-  loginWithGoogle(): Promise<UserCredential> {
-    return signInWithPopup(this.auth, new GoogleAuthProvider());
+  private async saveUserProfile(user: User) {
+    if (!user || !user.uid) return;
+    const userRef = doc(this.firestore, 'users', user.uid);
+    await setDoc(userRef, {
+      uid: user.uid,
+      email: user.email || '',
+      displayName: user.displayName || '',
+      photoURL: user.photoURL || '',
+      lastLoginAt: serverTimestamp(),
+      createdAt: user.metadata?.creationTime ? new Date(user.metadata.creationTime) : serverTimestamp(),
+    }, { merge: true });
   }
 
-  loginWithEmail(email: string, password: string): Promise<UserCredential> {
-    return signInWithEmailAndPassword(this.auth, email, password);
+  async loginWithGoogle(): Promise<UserCredential> {
+    const cred = await signInWithPopup(this.auth, new GoogleAuthProvider());
+    await this.saveUserProfile(cred.user);
+    return cred;
   }
 
-  registerWithEmail(email: string, password: string): Promise<UserCredential> {
-    return createUserWithEmailAndPassword(this.auth, email, password);
+  async loginWithEmail(email: string, password: string): Promise<UserCredential> {
+    const cred = await signInWithEmailAndPassword(this.auth, email, password);
+    await this.saveUserProfile(cred.user);
+    return cred;
+  }
+
+  async registerWithEmail(email: string, password: string): Promise<UserCredential> {
+    const cred = await createUserWithEmailAndPassword(this.auth, email, password);
+    await this.saveUserProfile(cred.user);
+    return cred;
   }
 
   logout(): Promise<void> {

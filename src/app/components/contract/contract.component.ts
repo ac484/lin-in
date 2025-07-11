@@ -83,6 +83,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   safeUrl: SafeResourceUrl | null = null;
   dragging = false;
   showStepper = false;
+  expandedContracts = new Set<string>();
   // 請款相關屬性與方法已移除
 
   // --------------------
@@ -193,7 +194,12 @@ export class ContractComponent implements OnInit, OnDestroy {
   }
   toggleExpand(contract: Contract, event: Event): void {
     event.stopPropagation();
-    (contract as any).expanded = !(contract as any).expanded;
+    const code = contract.code;
+    if (this.expandedContracts.has(code)) {
+      this.expandedContracts.delete(code);
+    } else {
+      this.expandedContracts.add(code);
+    }
   }
   editContract(contract: Contract, event: Event): void {
     event.stopPropagation();

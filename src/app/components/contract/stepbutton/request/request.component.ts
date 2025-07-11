@@ -56,8 +56,8 @@ export class RequestComponent {
     const newRound = payments.length + 1;
     let applicant = '未知';
     const user = this.user;
-    if (user && typeof user === 'object' && 'displayName' in user) {
-      applicant = (user as any).displayName || '未知';
+    if (user && typeof user === 'object') {
+      applicant = (user.displayName || user.email || '未知');
     } else if (typeof user === 'string') {
       applicant = user;
     }
