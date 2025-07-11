@@ -36,20 +36,32 @@
               <th>合約資訊</th>
               <th>合約金額</th>
               <th>進度摘要</th>
-              <th>標籤</th>
-              <th>操作</th>
               <th>申請</th>
-              <th>變更</th>
-              <th>檔案</th>
+              <th>追加減</th>
+              <th>標籤</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-contract let-rowIndex="rowIndex">
             <tr [pSelectableRow]="contract" [pSelectableRowIndex]="rowIndex"
               [class.bg-blue-50]="selectedContract?.code === contract.code"
               (click)="selectContract(contract)">
-              <td>{{ contract.code }}</td>
               <td>
-                {{ getDaysSinceCreation(contract) }} 天
+                <button
+                  pButton
+                  type="button"
+                  [icon]="expandedContracts.has(contract.code) ? 'pi pi-angle-up' : 'pi pi-angle-down'"
+                  class="p-button-text p-0 mr-1 expand-btn"
+                  (click)="toggleExpand(contract, $event)"
+                  tabindex="-1"
+                  aria-label="展開/收合"
+                ></button>
+                {{ contract.code }}
+              </td>
+              <td>
+                <div class="flex flex-col items-start gap-1">
+                  <span><i class="pi pi-calendar-plus text-xs mr-1"></i>{{ getDaysSinceCreation(contract) }}</span>
+                  <app-file [contract]="contract" [uploadingContractCode]="uploadingContractCode" (uploading)="onUploading($event)" (uploaded)="onUploaded($event)"></app-file>
+                </div>
               </td>
               <td [style.color]="getInfoBgColor(contract)">
                 <div>{{ contract.orderNo }}</div>
@@ -81,37 +93,26 @@
                 </div>
               </td>
               <td (click)="$event.stopPropagation()">
+                <button pButton type="button" icon="pi pi-wallet" class="p-button-text p-0"
+                  (click)="requestComponent.open(contract, user)"></button>
+              </td>
+              <td (click)="$event.stopPropagation()">
+                <div class="flex flex-col gap-1 items-center">
+                  <button pButton type="button" icon="pi pi-plus-circle" class="p-button-text p-0"
+                    (click)="openChangeDialog(contract, '追加', $event)"></button>
+                  <button pButton type="button" icon="pi pi-minus-circle" class="p-button-text p-0 text-red-600"
+                    (click)="openChangeDialog(contract, '追減', $event)"></button>
+                </div>
+              </td>
+              <td (click)="$event.stopPropagation()">
                 <app-chips 
                   [tags]="contract.tags || []" 
                   (tagsChange)="updateContractTags(contract, $event)">
                 </app-chips>
               </td>
-              <td (click)="$event.stopPropagation()">
-                <button
-                  pButton
-                  type="button"
-                  [icon]="expandedContracts.has(contract.code) ? 'pi pi-angle-up' : 'pi pi-angle-down'"
-                  class="p-button-text p-0"
-                  (click)="toggleExpand(contract, $event)"
-                >
-                </button>
-              </td>
-              <td (click)="$event.stopPropagation()">
-                <button pButton type="button" icon="pi pi-plus-circle" class="p-button-text p-0"
-                  (click)="requestComponent.open(contract, user)"></button>
-              </td>
-              <td (click)="$event.stopPropagation()">
-                <button pButton type="button" icon="pi pi-plus" class="p-button-text p-0"
-                  (click)="openChangeDialog(contract, '追加', $event)"></button>
-                <button pButton type="button" icon="pi pi-minus" class="p-button-text p-0 text-red-600"
-                  (click)="openChangeDialog(contract, '追減', $event)"></button>
-              </td>
-              <td (click)="$event.stopPropagation()">
-                <app-file [contract]="contract" [uploadingContractCode]="uploadingContractCode" (uploading)="onUploading($event)" (uploaded)="onUploaded($event)"></app-file>
-              </td>
             </tr>
             <tr *ngIf="expandedContracts.has(contract.code)">
-              <td colspan="13">
+              <td colspan="14">
                 <div class="flex flex-col gap-2">
                   <span>請款紀錄：</span>
                   <ng-container *ngIf="contract.payments?.length; else noPayments">
@@ -137,7 +138,7 @@
                           <button pButton type="button" label="拒絕" icon="pi pi-times-circle" class="p-button-sm p-button-danger" (click)="toStatus(contract, p, '已拒絕')"></button>
                         </ng-container>
                         <ng-container *ngIf="p.status === '開票中'">
-                          <button pButton type="button" label="放款" icon="pi pi-credit-card" class="p-button-sm mb-1" (click)="toStatus(contract, p, '放款中')"></button>
+                          <button pButton type="button" label="放款" icon="pi pi-wallet" class="p-button-sm mb-1" (click)="toStatus(contract, p, '放款中')"></button>
                         </ng-container>
                         <ng-container *ngIf="p.status === '放款中'">
                           <button pButton type="button" label="完成" icon="pi pi-check" class="p-button-sm mb-1" (click)="toStatus(contract, p, '完成')"></button>
@@ -166,7 +167,7 @@
           <!-- 表格底部：建立合約按鈕 -->
           <ng-template pTemplate="footer">
             <tr>
-              <td colspan="10" class="text-center p-0">
+              <td colspan="11" class="text-center p-0">
                 <button pButton type="button" class="p-button-text" (click)="showStepper = true">＋ 建立合約</button>
               </td>
             </tr>

@@ -119,3 +119,16 @@
 :host ::ng-deep .p-chip .p-chip-remove-icon {
   font-size: 0.6rem;
 }
+// 追加/追減欄按鈕極簡排列
+:host ::ng-deep td .flex.flex-col.items-center {
+  gap: 0.15rem;
+}
+// 編號欄展開按鈕間距
+:host ::ng-deep .expand-btn {
+  margin-right: 0.25rem;
+  vertical-align: middle;
+}
+// 狀態/檔案欄上下間距
+:host ::ng-deep td .flex.flex-col.items-start {
+  gap: 0.25rem;
+}
